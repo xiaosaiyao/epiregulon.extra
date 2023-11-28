@@ -36,13 +36,16 @@ findPartners <- function(graph, focal_tf){
     # skip focal tf
     if(i == 1) next
     tf <- V(tf_targets_subgraphs[[i]])[V(tf_targets_subgraphs[[i]])$type=="transcription factor" & V(tf_targets_subgraphs[[i]])$name==all_tfs[i]$name]
+    # determine targets shared between focal tf and current tf
     common_targets <- V(tf_targets_subgraphs[[i]])[V(tf_targets_subgraphs[[i]])$type=="target gene"]
+    # extract edges connection shared targets with the current tf
     edges_to_tf <- shortest_paths(tf_targets_subgraphs[[i]], from=tf, to=common_targets, output="epath")
     edges_to_tf <- do.call(c, edges_to_tf)
-    # find indices of common targets in all targets of focal tf
+    # find indices of common targets in the vector of all targets of focal tf
     common_targets_ind <- match(common_targets$name, focal_tf_targets$name)
     res_list[[tf$name]] <- data.frame(target = common_targets$name,
                                       focal_weight = focal_weights[common_targets_ind],
+                                      # extract weights from the edges
                                       other_tf_weight = igraph::get.edge.attribute(tf_targets_subgraphs[[i]],
                                                                                    index = edges_to_tf,
                                                                                    name = "weight"))

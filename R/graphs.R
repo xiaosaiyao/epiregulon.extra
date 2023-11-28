@@ -371,7 +371,7 @@ plotEpiregulonNetwork <-
 #' Plot graph with separate weights for different levels of the grouping factor
 #'
 #' @param regulon an object returned by the getRegulon or addWeights function
-#' @param cutoff a numeric used to select values of the variables passed in `groups`
+#' @param cutoff a numeric used to select values of the variables passed in `clusters`
 #' parameter. Values greater than `cutoff` are retained and used as
 #' graph edge weights.
 #' @param tf a character vector storing the names of transcription factors to be

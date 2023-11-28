@@ -16,7 +16,7 @@ plotDiffNetwork(
 \arguments{
 \item{regulon}{an object returned by the getRegulon or addWeights function}
 
-\item{cutoff}{a numeric used to select values of the variables passed in \code{groups}
+\item{cutoff}{a numeric used to select values of the variables passed in \code{clusters}
 parameter. Values greater than \code{cutoff} are retained and used as
 graph edge weights.}
 

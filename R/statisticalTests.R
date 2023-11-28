@@ -38,7 +38,7 @@ findDifferentialActivity <- function(activity_matrix,
                                      ...){
 
   if(lifecycle::is_present(groups)){
-      lifecycle::deprecate_warn( "1.0.0", "findDifferentialActivity(groups)",
+      lifecycle::deprecate_warn( "0.99.0", "findDifferentialActivity(groups)",
                                  "findDifferentialActivity(clusters)")
     clusters <- groups
   }
