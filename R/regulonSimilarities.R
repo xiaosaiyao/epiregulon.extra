@@ -8,6 +8,12 @@
 #' names of all target genes shared with focal transcription factor, weights of edges
 #' connecting transcription factor with target genes, equivalent weights for focal transcription
 #' factor and the element wise product of both weight columns.
+#' @example
+#' regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
+#' target = sample(letters[5:14], 100, replace = TRUE))
+#' regulon$weights <- runif(100)
+#' GRN_graph <- buildGraph(regulon)
+#' partners <- findPartners(GRN_graph, "a")
 findPartners <- function(graph, focal_tf){
   checkmate::assert_character(focal_tf, len = 1)
   checkmate::assert_class(graph, "igraph")
