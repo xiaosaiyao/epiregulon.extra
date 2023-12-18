@@ -95,14 +95,15 @@ getSigGenes <- function(da_list,
 
     if (nrow(da_genes) != 0){
       da_genes$class <- classes[[i]]
-      da_genes$tf <- rownames(da_genes); rownames(da_genes) <- NULL
+      da_genes$tf <- rownames(da_genes)
+      rownames(da_genes) <- NULL
     }
 
     if (is.null(topgenes)){
 
-      da_genes <- da_genes[order(da_genes$FDR, -(da_genes[, 3])),]
+      da_genes <- da_genes[order(da_genes$FDR, -direction_factor*(da_genes[, 3])),]
     } else {
-      da_genes <- da_genes[utils::head(order(da_genes$FDR, -(da_genes[, 3])), topgenes),]
+      da_genes <- da_genes[utils::head(order(da_genes$FDR, -direction_factor*(da_genes[, 3])), topgenes),]
     }
     #print(da_genes)
 
