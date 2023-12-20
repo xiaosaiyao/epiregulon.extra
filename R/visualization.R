@@ -304,7 +304,7 @@ plotBubble <- function (activity_matrix,
                          aes_string("clusters", "tf", color = "relative_activity")) +
       geom_point(stat = "identity", aes_string(size = "logpval")) +
       scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous(range = c(0, 7)) +
+      scale_size_continuous("-logpval", range = c(0, 7)) +
       theme_classic(base_size = 12) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       labs(color = legend.label)  + ylab(y.label) + xlab(x.label) +
@@ -316,7 +316,7 @@ plotBubble <- function (activity_matrix,
                          aes_string("clusters", "tf", color = "relative_activity")) +
       geom_point(stat = "identity", aes_string(size = "summary.logFC")) +
       scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous(range = c(0, 7)) +
+      scale_size_continuous("-logpval", range = c(0, 7)) +
       theme_classic(base_size = 12) +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
       labs(color = legend.label) +
