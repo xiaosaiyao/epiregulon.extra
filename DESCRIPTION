@@ -41,7 +41,8 @@ Suggests:
     dorothea,
     scuttle,
     S4Vectors,
-    scuttle
+    scuttle,
+    vdiffr
 VignetteBuilder: knitr
 URL:
 biocViews: Software, NetworkInference, Epigenetics, SingleCell, GeneRegulation, Network
