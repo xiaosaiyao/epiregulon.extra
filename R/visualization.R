@@ -1,26 +1,20 @@
 
 
-plotActivityDim_ <- function(sce,
-                             activity_matrix,
-                             tf,
-                             dimtype,
-                             label,
-                             legend.label,
-                             colors,
-                             limit,
-                             ...){
+plotActivityDim_ <- function(sce, activity_matrix, tf, dimtype,
+    label, legend.label, colors, limit, ...) {
 
-  tf.activity <- as.numeric(activity_matrix[tf,])
-  sce$activity <- tf.activity
+    tf.activity <- as.numeric(activity_matrix[tf, ])
+    sce$activity <- tf.activity
 
-  g <- scater::plotReducedDim(sce, dimred = dimtype, colour_by="activity",
-                              text_by = label,...)
+    g <- scater::plotReducedDim(sce, dimred = dimtype, colour_by = "activity",
+        text_by = label, ...)
 
-  g <- g + scale_color_gradient(low = colors[1], high = colors[2], limit = limit, oob=scales::squish) + ggtitle(tf) +
-    labs(color=legend.label) +
-    theme_classic(base_size = 12) + theme(plot.title = element_text(hjust = 0.5))
+    g <- g + scale_color_gradient(low = colors[1], high = colors[2],
+        limit = limit, oob = scales::squish) + ggtitle(tf) +
+        labs(color = legend.label) + theme_classic(base_size = 12) +
+        theme(plot.title = element_text(hjust = 0.5))
 
-  return(g)
+    return(g)
 
 }
 
@@ -38,7 +32,7 @@ plotActivityDim_ <- function(sce,
 #' @param combine logical to indicate whether to combine and visualize the plots in one panel
 #' @param legend.label String indicating the name of variable to be plotted on the legend
 #' @param colors A vector of 2 colors for the intensity, with the first element refering to the lower value and
-#' the second elment refering to the higher value. Default is c("blue","yellow").
+#' the second elment refering to the higher value. Default is c('blue','yellow').
 #' @param limit A vector of lower and upper bounds for the color scale. The default option is NULL and will adjust
 #' to minimal and maximal values
 #' @param ... Additional arguments from scater::plotReducedDim
@@ -55,98 +49,87 @@ plotActivityDim_ <- function(sce,
 #' example_sce <- scater::runUMAP(example_sce)
 #' example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 #' plotActivityDim(sce = example_sce, activity = logcounts(example_sce),
-#' tf = c("Gene_0001","Gene_0002"),  label = "cluster")
+#' tf = c('Gene_0001','Gene_0002'),  label = 'cluster')
 
 #' @author Xiaosai Yao, Shang-yang Chen
 #'
 plotActivityDim <- function(sce = NULL,
-                            activity_matrix,
-                            tf,
-                            dimtype ="UMAP",
-                            label = NULL,
-                            ncol = NULL,
-                            nrow = NULL,
-                            title = NULL,
-                            combine = TRUE,
-                            legend.label = "activity",
-                            colors = c("blue","yellow"),
-                            limit = NULL,
-                            ...){
+    activity_matrix, tf, dimtype = "UMAP",
+    label = NULL, ncol = NULL, nrow = NULL,
+    title = NULL, combine = TRUE, legend.label = "activity",
+    colors = c("blue", "yellow"), limit = NULL,
+    ...) {
 
-  # give warning for genes absent in tf list
-  missing <- tf[which(! tf %in% rownames(activity_matrix))]
-  if (!identical(missing, character(0))) {
-    writeLines(paste0(missing, " not found in activity matrix. Excluded from plots"))
-  }
+    # give warning for genes absent in tf list
+    missing <- tf[which(!tf %in% rownames(activity_matrix))]
+    if (!identical(missing, character(0))) {
+        writeLines(paste0(missing,
+            " not found in activity matrix. Excluded from plots"))
+    }
 
-  tf <- tf[which(tf %in% rownames(activity_matrix))]
+    tf <- tf[which(tf %in% rownames(activity_matrix))]
 
 
-  gs <- lapply(tf, function(x) {
-    suppressMessages(return(plotActivityDim_(sce, activity_matrix, x, dimtype, label, legend.label, colors, limit, ...)))
-  })
+    gs <- lapply(tf, function(x) {
+        suppressMessages(return(plotActivityDim_(sce,
+            activity_matrix, x, dimtype,
+            label, legend.label, colors,
+            limit, ...)))
+    })
 
-  if (combine == TRUE) {
+    if (combine == TRUE) {
 
-    gs <- patchwork::wrap_plots(gs, ncol = ncol, nrow=nrow) +
-      patchwork::plot_annotation(title = title)
+        gs <- patchwork::wrap_plots(gs,
+            ncol = ncol, nrow = nrow) +
+            patchwork::plot_annotation(title = title)
 
-    return(gs)
+        return(gs)
 
-  } else {
+    } else {
 
-    return(gs)
+        return(gs)
 
-  }
+    }
 
 }
 
 
 
-plotActivityViolin_ <- function(activity_matrix,
-                                tf,
-                                clusters,
-                                legend.label,
-                                colors,
-                                text_size,
-                                facet_grid_variable,
-                                boxplot){
+plotActivityViolin_ <- function(activity_matrix, tf, clusters,
+    legend.label, colors, text_size, facet_grid_variable,
+    boxplot) {
 
-  tf.activity <- as.numeric(activity_matrix[tf,])
+    tf.activity <- as.numeric(activity_matrix[tf, ])
 
-  df <- data.frame(activity = tf.activity,
-                   clusters = clusters)
+    df <- data.frame(activity = tf.activity, clusters = clusters)
 
-  if (!is.null(facet_grid_variable)){
-    df$facet <- facet_grid_variable
-  }
+    if (!is.null(facet_grid_variable)) {
+        df$facet <- facet_grid_variable
+    }
 
 
-  g <- ggplot2::ggplot(df, aes_string(x = "clusters",
-                                      y = "activity",
-                                      fill = "clusters")) +
-    geom_violin() +
-    theme_classic(base_size = 12) +
-    ggtitle(tf) + ylab(legend.label) +
-    theme(legend.position = "none",
-          plot.title = element_text(hjust = 0.5),
-          axis.text.x = element_text(angle = 90, hjust = 1))
+    g <- ggplot2::ggplot(df, aes_string(x = "clusters",
+        y = "activity", fill = "clusters")) + geom_violin() +
+        theme_classic(base_size = 12) + ggtitle(tf) + ylab(legend.label) +
+        theme(legend.position = "none", plot.title = element_text(hjust = 0.5),
+            axis.text.x = element_text(angle = 90, hjust = 1))
 
-  if (!is.null(colors)){
-    g <- g +  scale_fill_manual(values = colors)
-  }
+    if (!is.null(colors)) {
+        g <- g + scale_fill_manual(values = colors)
+    }
 
-  if (!is.null(facet_grid_variable)){
-    g <- g +  facet_grid(stats::reformulate("facet","."), scales = "free", space = "free")
-  }
+    if (!is.null(facet_grid_variable)) {
+        g <- g + facet_grid(stats::reformulate("facet",
+            "."), scales = "free", space = "free")
+    }
 
-  if (boxplot){
-    g <- g + geom_boxplot(width=0.1)
-  }
-  g <- g +   theme(text = element_text(size = text_size))
+    if (boxplot) {
+        g <- g + geom_boxplot(width = 0.1)
+    }
+    g <- g + theme(text = element_text(size = text_size))
 
 
-  return(g)
+    return(g)
 
 }
 
@@ -175,53 +158,40 @@ plotActivityViolin_ <- function(activity_matrix,
 #' example_sce <- scuttle::logNormCounts(example_sce)
 #' example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 #' plotActivityViolin(activity_matrix = logcounts(example_sce),
-#' tf = c("Gene_0001","Gene_0002"),  clusters = example_sce$cluster)
+#' tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
 #'
 #' @author Xiaosai Yao, Shang-yang Chen
-plotActivityViolin <- function(activity_matrix,
-                               tf,
-                               clusters,
-                               ncol = NULL,
-                               nrow = NULL,
-                               combine = TRUE,
-                               legend.label = "activity",
-                               colors = NULL,
-                               title = NULL,
-                               text_size = 10,
-                               facet_grid_variable = NULL,
-                               boxplot = FALSE){
+plotActivityViolin <- function(activity_matrix, tf, clusters,
+    ncol = NULL, nrow = NULL, combine = TRUE, legend.label = "activity",
+    colors = NULL, title = NULL, text_size = 10, facet_grid_variable = NULL,
+    boxplot = FALSE) {
 
-  # give warning for genes absent in tf list
-  missing <- tf[which(! tf %in% rownames(activity_matrix))]
-  if (!identical(missing, character(0))) {
-    message(missing, " not found in activity matrix. Excluded from plots")
-  }
-  tf <- tf[which(tf %in% rownames(activity_matrix))]
+    # give warning for genes absent in tf list
+    missing <- tf[which(!tf %in% rownames(activity_matrix))]
+    if (!identical(missing, character(0))) {
+        message(missing, " not found in activity matrix. Excluded from plots")
+    }
+    tf <- tf[which(tf %in% rownames(activity_matrix))]
 
-  gs <- lapply(tf, function(x) {
-    return(plotActivityViolin_(activity_matrix,
-                               x,
-                               clusters,
-                               legend.label,
-                               colors,
-                               text_size,
-                               facet_grid_variable,
-                               boxplot))
-  })
+    gs <- lapply(tf, function(x) {
+        return(plotActivityViolin_(activity_matrix, x,
+            clusters, legend.label, colors, text_size,
+            facet_grid_variable, boxplot))
+    })
 
-  if (combine == TRUE) {
+    if (combine == TRUE) {
 
-    gs <- patchwork::wrap_plots(gs, ncol = ncol, nrow=nrow) +
-      patchwork::plot_annotation(title = title,
-                                 theme = theme(plot.title = element_text(hjust = 0.5)))
+        gs <- patchwork::wrap_plots(gs, ncol = ncol, nrow = nrow) +
+            patchwork::plot_annotation(title = title,
+                theme = theme(plot.title = element_text(hjust = 0.5)))
 
-    return(gs)
+        return(gs)
 
-  } else {
+    } else {
 
-    return(gs)
+        return(gs)
 
-  }
+    }
 
 }
 
@@ -249,105 +219,100 @@ plotActivityViolin <- function(activity_matrix,
 #' example_sce <- scuttle::logNormCounts(example_sce)
 #' example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 #' plotBubble(activity_matrix = logcounts(example_sce),
-#' tf = c("Gene_0001","Gene_0002"),  clusters = example_sce$cluster)
+#' tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
 #' @author Shang-yang Chen
-plotBubble <- function (activity_matrix,
-                        tf,
-                        clusters,
-                        bubblesize = c("FDR","summary.logFC"),
-                        color.theme = "viridis",
-                        legend.label = "relative_activity",
-                        x.label = "clusters",
-                        y.label = "transcription factors",
-                        title = "TF activity",
-                        ...){
+plotBubble <- function(activity_matrix, tf, clusters,
+    bubblesize = c("FDR", "summary.logFC"), color.theme = "viridis",
+    legend.label = "relative_activity", x.label = "clusters",
+    y.label = "transcription factors", title = "TF activity",
+    ...) {
 
-  bubblesize <- match.arg(bubblesize)
+    bubblesize <- match.arg(bubblesize)
 
-  # give warning for genes absent in tf list
-  missing <- tf[which(! tf %in% rownames(activity_matrix))]
-  if (!identical(missing, character(0))) {
-    message(missing, " not found in activity matrix. Excluded from plots")
-  }
-  tf <- tf[which(tf %in% rownames(activity_matrix))]
+    # give warning for genes absent in tf list
+    missing <- tf[which(!tf %in% rownames(activity_matrix))]
+    if (!identical(missing, character(0))) {
+        message(missing, " not found in activity matrix. Excluded from plots")
+    }
+    tf <- tf[which(tf %in% rownames(activity_matrix))]
 
-  #find logFC and FDR of TFs
-  markers <- findDifferentialActivity(activity_matrix, clusters,
-                                      ...)
-  markers <- suppressMessages(getSigGenes(markers, fdr_cutoff = 1.5,
-                                          logFC_cutoff = -100))
-  markers <- markers[which(markers$tf %in% tf), ]
-  levels <- make.names(unique(tf[tf %in% markers$tf]))
-  markers$tf <- make.names(markers$tf)
-  #rename markers
-  colnames(markers)[colnames(markers) == "class"] <- "clusters"
+    # find logFC and FDR of TFs
+    markers <- findDifferentialActivity(activity_matrix,
+        clusters, ...)
+    markers <- suppressMessages(getSigGenes(markers,
+        fdr_cutoff = 1.5, logFC_cutoff = -100))
+    markers <- markers[which(markers$tf %in% tf),
+        ]
+    levels <- make.names(unique(tf[tf %in% markers$tf]))
+    markers$tf <- make.names(markers$tf)
+    # rename markers
+    colnames(markers)[colnames(markers) == "class"] <- "clusters"
 
 
-  # z normalize activity and compute mean by cluster
-  tf.activity <- activity_matrix[tf, ,drop=FALSE]
-  df <- data.frame(clusters = clusters, t(as.matrix(tf.activity)))
-  df.mean <- stats::aggregate(. ~ clusters, df, mean)
-  zscores <- apply(df.mean[, -1], 2, scale)
-  df.mean <- data.frame(clusters = df.mean[, 1], as.data.frame(zscores))
-  df.plot <- suppressMessages(reshape2::melt(df.mean, id.variable="clusters", variable.name = "tf", value.name = "relative_activity"))
+    # z normalize activity and compute mean by cluster
+    tf.activity <- activity_matrix[tf, , drop = FALSE]
+    df <- data.frame(clusters = clusters, t(as.matrix(tf.activity)))
+    df.mean <- stats::aggregate(. ~ clusters, df,
+        mean)
+    zscores <- apply(df.mean[, -1], 2, scale)
+    df.mean <- data.frame(clusters = df.mean[, 1],
+        as.data.frame(zscores))
+    df.plot <- suppressMessages(reshape2::melt(df.mean,
+        id.variable = "clusters", variable.name = "tf",
+        value.name = "relative_activity"))
 
-  # merge logFC, FDR and mean activity
-  df.plot <- merge(df.plot, markers, by = c("tf","clusters"))
-  df.plot$tf <- factor(as.character(df.plot$tf), levels = levels )
+    # merge logFC, FDR and mean activity
+    df.plot <- merge(df.plot, markers, by = c("tf",
+        "clusters"))
+    df.plot$tf <- factor(as.character(df.plot$tf),
+        levels = levels)
 
-  # generate bubble plots
-  if (bubblesize == "FDR") {
-    logpval <- -log10(df.plot$FDR)
-    max.logpval <- max(logpval[is.finite(logpval)])
-    logpval <- replace(logpval, is.infinite(logpval), max.logpval)
-    g <- ggplot2::ggplot(df.plot,
-                         aes_string("clusters", "tf", color = "relative_activity")) +
-      geom_point(stat = "identity", aes_string(size = "logpval")) +
-      scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous("-logpval", range = c(0, 7)) +
-      theme_classic(base_size = 12) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-      labs(color = legend.label)  + ylab(y.label) + xlab(x.label) +
-      ylab(y.label) + xlab(x.label) +
-      ggtitle(title)
-  }
-  else if (bubblesize == "summary.logFC") {
-    g <- ggplot2::ggplot(df.plot,
-                         aes_string("clusters", "tf", color = "relative_activity")) +
-      geom_point(stat = "identity", aes_string(size = "summary.logFC")) +
-      scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous("-logpval", range = c(0, 7)) +
-      theme_classic(base_size = 12) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-      labs(color = legend.label) +
-      ylab(y.label) + xlab(x.label) +
-      ggtitle(title)
-  }
-  return(g)
+    # generate bubble plots
+    if (bubblesize == "FDR") {
+        logpval <- -log10(df.plot$FDR)
+        max.logpval <- max(logpval[is.finite(logpval)])
+        logpval <- replace(logpval, is.infinite(logpval),
+            max.logpval)
+        g <- ggplot2::ggplot(df.plot, aes_string("clusters",
+            "tf", color = "relative_activity")) +
+            geom_point(stat = "identity", aes_string(size = "logpval")) +
+            scale_color_viridis_c(option = color.theme) +
+            scale_size_continuous("-logpval", range = c(0,
+                7)) + theme_classic(base_size = 12) +
+            theme(axis.text.x = element_text(angle = 45,
+                hjust = 1)) + labs(color = legend.label) +
+            ylab(y.label) + xlab(x.label) + ylab(y.label) +
+            xlab(x.label) + ggtitle(title)
+    } else if (bubblesize == "summary.logFC") {
+        g <- ggplot2::ggplot(df.plot, aes_string("clusters",
+            "tf", color = "relative_activity")) +
+            geom_point(stat = "identity", aes_string(size = "summary.logFC")) +
+            scale_color_viridis_c(option = color.theme) +
+            scale_size_continuous("-logpval", range = c(0,
+                7)) + theme_classic(base_size = 12) +
+            theme(axis.text.x = element_text(angle = 45,
+                hjust = 1)) + labs(color = legend.label) +
+            ylab(y.label) + xlab(x.label) + ggtitle(title)
+    }
+    return(g)
 }
 
 
-enrichPlot_ <- function(results,
-                        title,
-                        top) {
-  results$logP.adj <- -log10(results$p.adjust)
-  ggplot(results[seq_len(top), ] , aes_string(y = "logP.adj",
-                                              x = "Description",
-                                              color = "GeneRatio")) +
-    scale_colour_gradient(high = "red", low = "blue") +
-    geom_point(stat = 'identity', aes_string(size = "Odds.Ratio")) +
-    coord_flip() +
-    theme_bw() + ggtitle (title) +
-    ylab(expression("-log"[10]~"pval")) +
-    theme(
-      text = element_text(size = 10),
-      axis.text = element_text(size = 8),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      plot.title = element_text(hjust = 0.5),
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.spacing = unit(0.5, "lines")
-    )
+enrichPlot_ <- function(results, title, top) {
+    results$logP.adj <- -log10(results$p.adjust)
+    ggplot(results[seq_len(top), ], aes_string(y = "logP.adj",
+        x = "Description", color = "GeneRatio")) +
+        scale_colour_gradient(high = "red", low = "blue") +
+        geom_point(stat = "identity", aes_string(size = "Odds.Ratio")) +
+        coord_flip() + theme_bw() + ggtitle(title) +
+        ylab(expression("-log"[10] ~ "pval")) +
+        theme(text = element_text(size = 10),
+            axis.text = element_text(size = 8),
+            axis.text.x = element_text(angle = 45,
+                hjust = 1), plot.title = element_text(hjust = 0.5),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.spacing = unit(0.5, "lines"))
 }
 
 #' Plot results of regulonEnrich
@@ -364,10 +329,10 @@ enrichPlot_ <- function(results,
 
 #' @examples
 #' #retrieve genesets
-#' H <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-#' cat = "H", gene.id.type = "SYMBOL" )
-#' C6 <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-#' cat = "C6", gene.id.type = "SYMBOL" )
+#' H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+#' cat = 'H', gene.id.type = 'SYMBOL' )
+#' C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+#' cat = 'C6', gene.id.type = 'SYMBOL' )
 #'
 #' #combine genesets and convert genesets to be compatible with enricher
 #' gs <- c(H,C6)
@@ -378,38 +343,35 @@ enrichPlot_ <- function(results,
 #'
 #' #get regulon
 #' library(dorothea)
-#' data(dorothea_hs, package = "dorothea")
+#' data(dorothea_hs, package = 'dorothea')
 #' regulon <- dorothea_hs
-#' enrichment_results <- regulonEnrich(c("ESR1","AR"), regulon = regulon, weight = "mor",
+#' enrichment_results <- regulonEnrich(c('ESR1','AR'), regulon = regulon, weight = 'mor',
 #' genesets = gs.list)
 #'
 #' # plot graph
 #' enrichPlot(results = enrichment_results )
 #'
 #' @author Xiaosai Yao
-enrichPlot <- function(results,
-                       top = 15,
-                       ncol = 3,
-                       title = NULL,
-                       combine = TRUE) {
+enrichPlot <- function(results, top = 15, ncol = 3, title = NULL,
+    combine = TRUE) {
 
-  gs <- lapply(names(results), function(x) {
-    enrichPlot_(results[[x]], x, top)
-  })
+    gs <- lapply(names(results), function(x) {
+        enrichPlot_(results[[x]], x, top)
+    })
 
-  if (combine == TRUE) {
+    if (combine == TRUE) {
 
-    gs <- patchwork::wrap_plots(gs, ncol = ncol) +
-      patchwork::plot_annotation(title = title,
-                                 theme = theme(plot.title = element_text(hjust = 0.5)))
+        gs <- patchwork::wrap_plots(gs, ncol = ncol) +
+            patchwork::plot_annotation(title = title,
+                theme = theme(plot.title = element_text(hjust = 0.5)))
 
-    return(gs)
+        return(gs)
 
-  } else {
+    } else {
 
-    return(gs)
+        return(gs)
 
-  }
+    }
 
 }
 
@@ -425,7 +387,7 @@ enrichPlot <- function(results,
 #' @param downsample Integer indicating the number of cells to sample from the matrix
 #' @param scale Logical indicating whether to scale the heatmap
 #' @param center Logical indicating whether to center the heatmap
-#' @param color_breaks 	A vector indicating numeric breaks as input to `circlize::colorRamp2`
+#' @param color_breaks \tA vector indicating numeric breaks as input to `circlize::colorRamp2`
 #' @param colors A vector of colors corresponding to values in `breaks` as input to `circlize::colorRamp2`
 #' @param cell_attributes A character vector matching the column names of `colData(sce)` to be used for plotting
 #' @param col_gap String indicating the cell attribute to split the columns of the heatmap by
@@ -447,89 +409,105 @@ enrichPlot <- function(results,
 #' example_sce <- scuttle::mockSCE()
 #' example_sce <- scuttle::logNormCounts(example_sce)
 #' example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
-#' regulon <- data.frame(tf=c(rep("Gene_0001",10),rep("Gene_0002",20)),
+#' regulon <- data.frame(tf=c(rep('Gene_0001',10),rep('Gene_0002',20)),
 #' target = sample(rownames(example_sce),30), weight = rnorm(30))
 #' #plot heatmap and rotate labels
-#' plotHeatmapRegulon(example_sce, tfs=c("Gene_0001","Gene_0002"), regulon=regulon,
-#' cell_attributes="cluster", col_gap = "cluster", column_title_rot = 90)
+#' plotHeatmapRegulon(example_sce, tfs=c('Gene_0001','Gene_0002'), regulon=regulon,
+#' cell_attributes='cluster', col_gap = 'cluster', column_title_rot = 90)
 #' @author Xiaosai Yao
 
 plotHeatmapRegulon <- function(sce,
-                               tfs,
-                               regulon,
-                               regulon_column="weight",
-                               regulon_cutoff=0.1,
-                               downsample=1000,
-                               scale=TRUE,
-                               center=TRUE,
-                               color_breaks=c(-2,0,2),
-                               colors=c("blue", "white", "red"),
-                               cell_attributes,
-                               col_gap=NULL,
-                               exprs_values="logcounts",
-                               use_raster=TRUE,
-                               raster_quality=10,
-                               cluster_rows=FALSE,
-                               cluster_columns=FALSE,
-                               border = TRUE,
-                               show_column_names=FALSE,
-                               column_col=NULL,
-                               row_col=NULL,
-                               ...) {
+    tfs, regulon, regulon_column = "weight",
+    regulon_cutoff = 0.1,
+    downsample = 1000,
+    scale = TRUE, center = TRUE,
+    color_breaks = c(-2,
+        0, 2), colors = c("blue",
+        "white", "red"),
+    cell_attributes, col_gap = NULL,
+    exprs_values = "logcounts",
+    use_raster = TRUE,
+    raster_quality = 10,
+    cluster_rows = FALSE,
+    cluster_columns = FALSE,
+    border = TRUE, show_column_names = FALSE,
+    column_col = NULL,
+    row_col = NULL, ...) {
 
-  downsample_seq <- seq(from=1, to=ncol(sce), by=floor(max(1, ncol(sce)/downsample)))
+    downsample_seq <- seq(from = 1,
+        to = ncol(sce),
+        by = floor(max(1,
+            ncol(sce)/downsample)))
 
-  # keep only targets belonging to TFs and meeting cutoff
-  if (is.matrix(regulon[[regulon_column]])){
-    regulon <- regulon[regulon$tf %in% tfs & apply(regulon[[regulon_column]],1,function(x) any(x > regulon_cutoff)),]
-  }
-  else{
-    regulon <- regulon[regulon$tf %in% tfs & regulon[,regulon_column] > regulon_cutoff,]
-  }
+    # keep only targets belonging to TFs and meeting cutoff
+    if (is.matrix(regulon[[regulon_column]])) {
+        regulon <- regulon[regulon$tf %in%
+            tfs & apply(regulon[[regulon_column]],
+            1, function(x) any(x >
+                regulon_cutoff)),
+            ]
+    } else {
+        regulon <- regulon[regulon$tf %in%
+            tfs & regulon[,
+            regulon_column] >
+            regulon_cutoff,
+            ]
+    }
 
-  regulon <- regulon[order(regulon$tf),]
+    regulon <- regulon[order(regulon$tf),
+        ]
 
-  # remove duplicated genes from each tf
-  for (tf in stats::na.omit(unique(regulon$tf))) {
-   regulon <- regulon[!duplicated(regulon$target[regulon$tf == tf]),]
-  }
+    # remove duplicated genes from each tf
+    for (tf in stats::na.omit(unique(regulon$tf))) {
+        regulon <- regulon[!duplicated(regulon$target[regulon$tf ==
+            tf]), ]
+    }
 
-  # remove targets not found in sce
-  regulon <- regulon[regulon$target %in% rownames(sce),]
-  targets <- regulon$target
+    # remove targets not found in sce
+    regulon <- regulon[regulon$target %in%
+        rownames(sce),
+        ]
+    targets <- regulon$target
 
-  sce <- sce[targets, downsample_seq]
-
-
-  right_annotation <- data.frame(tf=regulon$tf)
-  top_annotation <- data.frame(colData(sce)[cell_attributes])
-
-  if (!is.null(col_gap)) {
-    column_split <- top_annotation[col_gap]
-  } else {
-    column_split <- NULL
-  }
+    sce <- sce[targets,
+        downsample_seq]
 
 
+    right_annotation <- data.frame(tf = regulon$tf)
+    top_annotation <- data.frame(colData(sce)[cell_attributes])
 
-  mat <- as.matrix(SummarizedExperiment::assay(sce, exprs_values))
-  mat <- t(scale(t(mat), scale=scale, center=center))
+    if (!is.null(col_gap)) {
+        column_split <- top_annotation[col_gap]
+    } else {
+        column_split <- NULL
+    }
 
-  col_fun <- circlize::colorRamp2(color_breaks, colors)
 
-  ComplexHeatmap::Heatmap(mat,
-                          col = col_fun,
-                          top_annotation=ComplexHeatmap::HeatmapAnnotation(df=top_annotation, col = column_col),
-                          right_annotation=ComplexHeatmap::rowAnnotation(df=right_annotation, col = row_col),
-                          row_split=right_annotation,
-                          column_split= column_split,
-                          use_raster=use_raster,
-                          raster_quality=raster_quality,
-                          cluster_rows=cluster_rows,
-                          cluster_columns=cluster_columns,
-                          border = border,
-                          show_column_names=show_column_names,
-                          ...)
+
+    mat <- as.matrix(SummarizedExperiment::assay(sce,
+        exprs_values))
+    mat <- t(scale(t(mat),
+        scale = scale,
+        center = center))
+
+    col_fun <- circlize::colorRamp2(color_breaks,
+        colors)
+
+    ComplexHeatmap::Heatmap(mat,
+        col = col_fun,
+        top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation,
+            col = column_col),
+        right_annotation = ComplexHeatmap::rowAnnotation(df = right_annotation,
+            col = row_col),
+        row_split = right_annotation,
+        column_split = column_split,
+        use_raster = use_raster,
+        raster_quality = raster_quality,
+        cluster_rows = cluster_rows,
+        cluster_columns = cluster_columns,
+        border = border,
+        show_column_names = show_column_names,
+        ...)
 }
 
 
@@ -541,7 +519,7 @@ plotHeatmapRegulon <- function(sce,
 #' @param downsample Integer indicating the number of cells to sample from the matrix
 #' @param scale Logical indicating whether to scale the heatmap
 #' @param center Logical indicating whether to center the heatmap
-#' @param color_breaks 	A vector indicating numeric breaks as input to `circlize::colorRamp2`
+#' @param color_breaks \tA vector indicating numeric breaks as input to `circlize::colorRamp2`
 #' @param colors A vector of colors corresponding to values in `breaks` as input to `circlize::colorRamp2`
 #' @param cell_attributes A character vector matching the column names of `colData(sce)` to be used for plotting
 #' @param col_gap String indicating the cell attribute to split the columns of the heatmap by
@@ -561,109 +539,103 @@ plotHeatmapRegulon <- function(sce,
 #' activity_matrix <- matrix(rnorm(10*200), nrow=10, ncol=200)
 #' rownames(activity_matrix) <- sample(rownames(example_sce),10)
 #' plotHeatmapActivity(activity_matrix=activity_matrix, sce=example_sce,
-#' tfs=rownames(activity_matrix), cell_attributes="cluster", col_gap="cluster")
+#' tfs=rownames(activity_matrix), cell_attributes='cluster', col_gap='cluster')
 #' @author Xiaosai Yao
-plotHeatmapActivity <- function(activity_matrix,
-                                sce,
-                                tfs,
-                                downsample=1000,
-                                scale=TRUE,
-                                center=TRUE,
-                                color_breaks=c(-2,0,2),
-                                colors=c("blue", "white", "red"),
-                                cell_attributes=NULL,
-                                col_gap=NULL,
-                                use_raster=TRUE,
-                                raster_quality=10,
-                                cluster_rows=TRUE,
-                                cluster_columns=FALSE,
-                                border = TRUE,
-                                show_column_names=FALSE,
-                                ...) {
+plotHeatmapActivity <- function(activity_matrix, sce, tfs, downsample = 1000,
+    scale = TRUE, center = TRUE, color_breaks = c(-2, 0, 2),
+    colors = c("blue", "white", "red"), cell_attributes = NULL,
+    col_gap = NULL, use_raster = TRUE, raster_quality = 10,
+    cluster_rows = TRUE, cluster_columns = FALSE, border = TRUE,
+    show_column_names = FALSE, ...) {
 
 
-  downsample_seq <- seq(from=1, to=ncol(sce), by=floor(max(1, ncol(sce)/downsample)))
+    downsample_seq <- seq(from = 1, to = ncol(sce), by = floor(max(1,
+        ncol(sce)/downsample)))
 
-  sce <- sce[,downsample_seq]
-  top_annotation <- data.frame(colData(sce)[cell_attributes])
+    sce <- sce[, downsample_seq]
+    top_annotation <- data.frame(colData(sce)[cell_attributes])
 
-  if (!is.null(col_gap)) {
-    column_split <- top_annotation[col_gap]
-  } else {
-    column_split <- NULL
-  }
+    if (!is.null(col_gap)) {
+        column_split <- top_annotation[col_gap]
+    } else {
+        column_split <- NULL
+    }
 
-  activity_matrix <- activity_matrix[tfs,downsample_seq]
-  activity_matrix <- Matrix::t(scale(Matrix::t(activity_matrix), scale=scale, center=center))
+    activity_matrix <- activity_matrix[tfs, downsample_seq]
+    activity_matrix <- Matrix::t(scale(Matrix::t(activity_matrix),
+        scale = scale, center = center))
 
-  col_fun <- circlize::colorRamp2(color_breaks, colors)
+    col_fun <- circlize::colorRamp2(color_breaks, colors)
 
-  ComplexHeatmap::Heatmap(activity_matrix,
-                          col = col_fun,
-                          top_annotation=ComplexHeatmap::HeatmapAnnotation(df=top_annotation),
-                          column_split=top_annotation[col_gap],
-                          use_raster=use_raster,
-                          raster_quality=raster_quality,
-                          cluster_rows=cluster_rows,
-                          cluster_columns=cluster_columns,
-                          border = border,
-                          show_column_names=show_column_names,
-                          ...)
+    ComplexHeatmap::Heatmap(activity_matrix, col = col_fun,
+        top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation),
+        column_split = top_annotation[col_gap], use_raster = use_raster,
+        raster_quality = raster_quality, cluster_rows = cluster_rows,
+        cluster_columns = cluster_columns, border = border,
+        show_column_names = show_column_names, ...)
 
 }
 
 
 
 #' @import ggplot2 ggbeeswarm
-plotDiagnostic <- function(idx,regulon, expMatrix,exp_assay, exp_cutoff=1, peakMatrix, peak_assay, peak_cutoff=0, clusters){
+plotDiagnostic <- function(idx, regulon, expMatrix, exp_assay,
+    exp_cutoff = 1, peakMatrix, peak_assay, peak_cutoff = 0,
+    clusters) {
 
-  target <- regulon$target[idx]
-  tf <- regulon$tf[idx]
-  peak <- regulon$idxATAC[idx]
+    target <- regulon$target[idx]
+    tf <- regulon$tf[idx]
+    peak <- regulon$idxATAC[idx]
 
-  tg_plot <- list()
-  for (cluster in unique(clusters)){
-    target_exp <- SummarizedExperiment::assay(expMatrix, exp_assay)[target, clusters == cluster]
-    tf_exp <- SummarizedExperiment::assay(expMatrix, exp_assay)[tf, clusters == cluster]
-    peak_accessibility <- SummarizedExperiment::assay(peakMatrix, peak_assay)[peak, clusters == cluster]
+    tg_plot <- list()
+    for (cluster in unique(clusters)) {
+        target_exp <- SummarizedExperiment::assay(expMatrix,
+            exp_assay)[target, clusters == cluster]
+        tf_exp <- SummarizedExperiment::assay(expMatrix, exp_assay)[tf,
+            clusters == cluster]
+        peak_accessibility <- SummarizedExperiment::assay(peakMatrix,
+            peak_assay)[peak, clusters == cluster]
 
-    if (is.null(exp_cutoff)){
-      exp_cutoff <- mean(tf_exp)
+        if (is.null(exp_cutoff)) {
+            exp_cutoff <- mean(tf_exp)
+        }
+
+        if (is.null(peak_cutoff)) {
+            peak_cutoff <- mean(peak_accessibility)
+        }
+        tf_exp.bi <- binarize(tf_exp, cutoff = exp_cutoff)
+        peak.bi <- binarize(peak_accessibility, cutoff = peak_cutoff)
+        tf_re.bi <- tf_exp.bi * peak.bi
+        tf_re.bi <- factor(tf_re.bi, levels = c(0, 1))
+
+        target_group <- data.frame(groups = as.vector(tf_re.bi),
+            target = as.vector(target_exp))
+        tg_plot[[cluster]] <- ggplot(target_group, aes(groups,
+            target)) + geom_boxplot() + geom_point(position = "jitter") +
+            ggtitle(paste0("target:", target, " tf:", tf, " peak:",
+                peak, " in ", cluster, "\n", " GRN corr:",
+                round(regulon$corr[idx, cluster], 2), " GRN pval:",
+                round(regulon$pval[idx, cluster], 2), " weight:",
+                round(regulon$weight[idx, cluster], 2)))
+
     }
 
-    if (is.null(peak_cutoff)){
-      peak_cutoff <- mean(peak_accessibility)
-    }
-    tf_exp.bi <- binarize(tf_exp, cutoff=exp_cutoff)
-    peak.bi <- binarize(peak_accessibility, cutoff=peak_cutoff)
-    tf_re.bi <- tf_exp.bi*peak.bi
-    tf_re.bi <- factor(tf_re.bi, levels = c(0,1))
-
-    target_group <- data.frame(groups=as.vector(tf_re.bi), target=as.vector(target_exp))
-    tg_plot[[cluster]] <- ggplot(target_group, aes(groups, target)) +  geom_boxplot() + geom_point(position = "jitter") +
-      ggtitle(paste0("target:", target, " tf:", tf, " peak:", peak, " in ", cluster, "\n",
-                      " GRN corr:", round(regulon$corr[idx,cluster],2),
-                      " GRN pval:", round(regulon$pval[idx,cluster],2),
-                      " weight:", round(regulon$weight[idx,cluster],2)))
-
-  }
-
-  tg_plot
+    tg_plot
 
 
 }
 
 binarize <- function(input_vector, cutoff) {
-  filtered <- as.numeric(input_vector > cutoff)
+    filtered <- as.numeric(input_vector > cutoff)
 }
 
-normalizeCols <- function(mat = NULL, scaleTo = NULL){
-  colSm <- Matrix::colSums(mat)
-  if(!is.null(scaleTo)){
-    mat@x <- scaleTo * mat@x / rep.int(colSm, Matrix::diff(mat@p))
-  }else{
-    mat@x <- mat@x / rep.int(colSm, Matrix::diff(mat@p))
-  }
-  return(mat)
+normalizeCols <- function(mat = NULL, scaleTo = NULL) {
+    colSm <- Matrix::colSums(mat)
+    if (!is.null(scaleTo)) {
+        mat@x <- scaleTo * mat@x/rep.int(colSm, Matrix::diff(mat@p))
+    } else {
+        mat@x <- mat@x/rep.int(colSm, Matrix::diff(mat@p))
+    }
+    return(mat)
 }
 
