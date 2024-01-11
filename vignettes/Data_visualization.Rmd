@@ -3,7 +3,7 @@ title: "Multiome data visualization with epiregulon.extra"
 author: "Xiaosai Yao, Tomasz Włodarczyk"
 email: "yao.xiaosai@gene.com"
 output:
-  BiocStyle::pdf_document:
+  BiocStyle::html_document:
     toc: true
     number_section: true
     self_contained: true
@@ -54,7 +54,7 @@ GeneExpressionMatrix$hash_assignment <- factor(as.character(GeneExpressionMatrix
 )
 ```
 
-## Calculate TF activity 
+# Calculate TF activity 
 
 Using `r BiocStyle::Biocpkg("epiregulon")` we can calculate activity of transcription factors inclued in the regulon object.
 
@@ -118,8 +118,8 @@ plotActivityViolin(
 ```
 
 Visualize the known differential TFs by UMAP
-```{r, fig.height = 8, fig.width = 12}
-plotActivityDim(
+```{r, fig.height = 6, fig.width = 9}
+ActivityPlot <- plotActivityDim(
   sce = GeneExpressionMatrix,
   activity_matrix = score.combine,
   tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
@@ -128,11 +128,16 @@ plotActivityDim(
   point_size = 1,
   ncol = 3
 )
+
+for(i in seq_len(length(ActivityPlot))){
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+}
+ActivityPlot
 ```
 
 In contrast, the gene expression of the TFs is very sparse
-```{r, fig.height = 8, fig.width = 12}
-plotActivityDim(
+```{r, fig.height = 6, fig.width = 9}
+ActivityPlot <- plotActivityDim(
   sce = GeneExpressionMatrix,
   activity_matrix = counts(GeneExpressionMatrix),
   tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
@@ -144,6 +149,10 @@ plotActivityDim(
   colors = c("grey", "blue"),
   legend.label = "GEX"
 )
+for(i in seq_len(length(ActivityPlot))){
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+}
+ActivityPlot
 ```
 
 Visualize the gene expression of the regulons by heatmap
@@ -158,7 +167,8 @@ plotHeatmapRegulon(
   col_gap = "hash_assignment",
   exprs_values = "normalizedCounts",
   name = "regulon heatmap",
-  column_title_rot = 45
+  column_title_rot = 45,
+  raster_quality=4
 )
 ```
 
@@ -171,7 +181,8 @@ plotHeatmapActivity(
   cell_attributes = "hash_assignment",
   col_gap = "hash_assignment",
   name = "Activity",
-  column_title_rot = 45
+  column_title_rot = 45,
+  raster_quality=4
 )
 ```
 # Geneset enrichment
