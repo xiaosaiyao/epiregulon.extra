@@ -51,7 +51,7 @@ example_sce <- scuttle::mockSCE()
 example_sce <- scuttle::logNormCounts(example_sce)
 example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 plotBubble(activity_matrix = logcounts(example_sce),
-tf = c("Gene_0001","Gene_0002"),  clusters = example_sce$cluster)
+tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
 }
 \author{
 Shang-yang Chen

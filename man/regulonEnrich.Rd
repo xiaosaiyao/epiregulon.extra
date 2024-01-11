@@ -11,7 +11,7 @@ regulonEnrich(TF, regulon, weight = "weight", weight_cutoff = 0.5, genesets)
 
 \item{regulon}{A matrix of weighted regulon consisting of tf, targets, corr and weight}
 
-\item{weight}{String indicating the column name that should be used to filter target genes for geneset enrichment. Default is "weight".}
+\item{weight}{String indicating the column name that should be used to filter target genes for geneset enrichment. Default is 'weight'.}
 
 \item{weight_cutoff}{A numeric scalar to indicate the cutoff to filter on the column specified by corr. Default is 0.5.}
 
@@ -25,10 +25,10 @@ Perform geneset enrichment of user-defined regulons
 }
 \examples{
 #retrieve genesets
-H <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-cat = "H", gene.id.type = "SYMBOL" )
-C6 <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-cat = "C6", gene.id.type = "SYMBOL" )
+H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+cat = 'H', gene.id.type = 'SYMBOL' )
+C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+cat = 'C6', gene.id.type = 'SYMBOL' )
 
 #combine genesets and convert genesets to be compatible with enricher
 gs <- c(H,C6)
@@ -39,9 +39,9 @@ head(gs.list)
 
 #get regulon
 library(dorothea)
-data(dorothea_hs, package = "dorothea")
+data(dorothea_hs, package = 'dorothea')
 regulon <- dorothea_hs
-enrichment_results <- regulonEnrich(c("ESR1","AR"), regulon = regulon, weight = "mor",
+enrichment_results <- regulonEnrich(c('ESR1','AR'), regulon = regulon, weight = 'mor',
 genesets = gs.list)
 
 }

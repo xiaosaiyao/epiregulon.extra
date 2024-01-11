@@ -25,10 +25,10 @@ Plot results of regulonEnrich
 }
 \examples{
 #retrieve genesets
-H <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-cat = "H", gene.id.type = "SYMBOL" )
-C6 <- EnrichmentBrowser::getGenesets(org = "hsa", db = "msigdb",
-cat = "C6", gene.id.type = "SYMBOL" )
+H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+cat = 'H', gene.id.type = 'SYMBOL' )
+C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
+cat = 'C6', gene.id.type = 'SYMBOL' )
 
 #combine genesets and convert genesets to be compatible with enricher
 gs <- c(H,C6)
@@ -39,9 +39,9 @@ head(gs.list)
 
 #get regulon
 library(dorothea)
-data(dorothea_hs, package = "dorothea")
+data(dorothea_hs, package = 'dorothea')
 regulon <- dorothea_hs
-enrichment_results <- regulonEnrich(c("ESR1","AR"), regulon = regulon, weight = "mor",
+enrichment_results <- regulonEnrich(c('ESR1','AR'), regulon = regulon, weight = 'mor',
 genesets = gs.list)
 
 # plot graph
