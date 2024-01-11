@@ -72,7 +72,7 @@ example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 activity_matrix <- matrix(rnorm(10*200), nrow=10, ncol=200)
 rownames(activity_matrix) <- sample(rownames(example_sce),10)
 plotHeatmapActivity(activity_matrix=activity_matrix, sce=example_sce,
-tfs=rownames(activity_matrix), cell_attributes="cluster", col_gap="cluster")
+tfs=rownames(activity_matrix), cell_attributes='cluster', col_gap='cluster')
 }
 \author{
 Xiaosai Yao

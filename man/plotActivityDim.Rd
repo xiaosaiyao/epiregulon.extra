@@ -42,7 +42,7 @@ plotActivityDim(
 \item{legend.label}{String indicating the name of variable to be plotted on the legend}
 
 \item{colors}{A vector of 2 colors for the intensity, with the first element refering to the lower value and
-the second elment refering to the higher value. Default is c("blue","yellow").}
+the second elment refering to the higher value. Default is c('blue','yellow').}
 
 \item{limit}{A vector of lower and upper bounds for the color scale. The default option is NULL and will adjust
 to minimal and maximal values}
@@ -63,7 +63,7 @@ example_sce <- scater::runPCA(example_sce)
 example_sce <- scater::runUMAP(example_sce)
 example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 plotActivityDim(sce = example_sce, activity = logcounts(example_sce),
-tf = c("Gene_0001","Gene_0002"),  label = "cluster")
+tf = c('Gene_0001','Gene_0002'),  label = 'cluster')
 }
 \author{
 Xiaosai Yao, Shang-yang Chen

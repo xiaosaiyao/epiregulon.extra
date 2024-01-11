@@ -1,0 +1,314 @@
+---
+title: "Multiome data visualization with epiregulon.extra"
+author: "Xiaosai Yao, Tomasz Włodarczyk"
+email: "yao.xiaosai@gene.com"
+output:
+  BiocStyle::html_document:
+    toc: true
+    number_section: true
+    self_contained: true
+    titlecaps: true
+package: "epiregulon.extra"
+vignette: >
+  %\VignetteIndexEntry{Multiome tutorial - MultiAssayExperiment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+This tutorial is continuation of the walk through the reprogram-seq data set begun in vignette. Here we present the data visualization and network analysis functions to explore in detail the results outputted from the `r BiocStyle::Biocpkg("epiregulon")` workflow. We will use the pruned version of regulon object in which only relevant columns are kept. 
+
+# Installation
+
+```{r, results='hide', message=FALSE}
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+#
+# BiocManager::install("epiregulon.extra")
+library(epiregulon)
+library(epiregulon.extra)
+```
+
+# Data preparation
+
+Apart from the regulon data frame we will need a gene expression matrix which together allow for the visualization of the insights provided by the `r BiocStyle::Biocpkg("epiregulon")` workflow. <br>
+
+```{r}
+# load the MAE object
+library(scMultiome)
+
+mae <- scMultiome::reprogramSeq()
+
+# expression matrix
+GeneExpressionMatrix <- mae[["GeneExpressionMatrix"]]
+rownames(GeneExpressionMatrix) <- rowData(GeneExpressionMatrix)$name
+
+reducedDim(GeneExpressionMatrix, "UMAP_Combined") <- reducedDim(mae[["TileMatrix500"]], "UMAP_Combined")
+
+# arrange hash_assigment
+GeneExpressionMatrix$hash_assignment <- factor(as.character(GeneExpressionMatrix$hash_assignment),
+  levels = c(
+    "HTO10_GATA6_UTR", "HTO2_GATA6_v2", "HTO8_NKX2.1_UTR", "HTO3_NKX2.1_v2",
+    "HTO1_FOXA2_v2", "HTO4_mFOXA1_v2", "HTO6_hFOXA1_UTR", "HTO5_NeonG_v2"
+  )
+)
+```
+
+# Calculate TF activity 
+
+Using `r BiocStyle::Biocpkg("epiregulon")` we can calculate activity of transcription factors inclued in the regulon object.
+
+```{r calculateActivity, results = "hide"}
+data(regulon)
+
+score.combine <- calculateActivity(
+  expMatrix = GeneExpressionMatrix,
+  regulon = regulon,
+  mode = "weight",
+  method = "weightedMean",
+  exp_assay = "normalizedCounts",
+  normalize = FALSE
+)
+```
+
+# Perform differential activity
+
+```{r differential}
+markers <- findDifferentialActivity(
+  activity_matrix = score.combine,
+  clusters = GeneExpressionMatrix$hash_assignment,
+  pval.type = "some",
+  direction = "up",
+  test.type = "t"
+)
+```
+
+Take the top TFs
+```{r}
+markers.sig <- getSigGenes(markers, topgenes = 5)
+```
+# Visualize the results
+
+First visualize the known differential TFs by bubble plot
+```{r visualization}
+plotBubble(
+  activity_matrix = score.combine,
+  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2"),
+  clusters = GeneExpressionMatrix$hash_assignment
+)
+```
+
+Then visualize the most differential TFs by clusters
+```{r}
+plotBubble(
+  activity_matrix = score.combine,
+  tf = markers.sig$tf,
+  clusters = GeneExpressionMatrix$hash_assignment
+)
+```
+
+Visualize the known differential TFs by violin plot. Note there is no activity calculated for SOX2 because the expression of SOX2 is 0 in all cells.
+
+```{r}
+plotActivityViolin(
+  activity_matrix = score.combine,
+  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+  clusters = GeneExpressionMatrix$hash_assignment
+)
+```
+
+Visualize the known differential TFs by UMAP
+```{r, fig.height = 6, fig.width = 9}
+ActivityPlot <- plotActivityDim(
+  sce = GeneExpressionMatrix,
+  activity_matrix = score.combine,
+  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+  dimtype = "UMAP_Combined",
+  label = "Clusters",
+  point_size = 1,
+  ncol = 3
+)
+
+for(i in seq_len(length(ActivityPlot))){
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+}
+ActivityPlot
+```
+
+In contrast, the gene expression of the TFs is very sparse
+```{r, fig.height = 6, fig.width = 9}
+ActivityPlot <- plotActivityDim(
+  sce = GeneExpressionMatrix,
+  activity_matrix = counts(GeneExpressionMatrix),
+  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+  dimtype = "UMAP_Combined",
+  label = "Clusters",
+  point_size = 1,
+  ncol = 3,
+  limit = c(0, 2),
+  colors = c("grey", "blue"),
+  legend.label = "GEX"
+)
+for(i in seq_len(length(ActivityPlot))){
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+}
+ActivityPlot
+```
+
+Visualize the gene expression of the regulons by heatmap
+```{r}
+plotHeatmapRegulon(
+  sce = GeneExpressionMatrix,
+  tfs = c("GATA6", "NKX2-1"),
+  regulon = regulon,
+  regulon_cutoff = 0,
+  downsample = 1000,
+  cell_attributes = "hash_assignment",
+  col_gap = "hash_assignment",
+  exprs_values = "normalizedCounts",
+  name = "regulon heatmap",
+  column_title_rot = 45,
+  raster_quality=4
+)
+```
+
+```{r}
+plotHeatmapActivity(
+  activity = score.combine,
+  sce = GeneExpressionMatrix,
+  tfs = c("GATA6", "NKX2-1", "FOXA1", "FOXA2"),
+  downsample = 5000,
+  cell_attributes = "hash_assignment",
+  col_gap = "hash_assignment",
+  name = "Activity",
+  column_title_rot = 45,
+  raster_quality=4
+)
+```
+# Geneset enrichment
+
+Sometimes we are interested to know what pathways are enriched in the regulon of a particular TF. We can perform geneset enrichment using the enricher function from [clusterProfiler](http://yulab-smu.top/biomedical-knowledge-mining-book/universal-api.html).
+
+```{r enrichment, fig.height = 10, fig.width = 12}
+# retrieve genesets
+H <- EnrichmentBrowser::getGenesets(
+  org = "hsa",
+  db = "msigdb",
+  cat = "H",
+  gene.id.type = "SYMBOL"
+)
+C2 <- EnrichmentBrowser::getGenesets(
+  org = "hsa",
+  db = "msigdb",
+  cat = "C2",
+  gene.id.type = "SYMBOL"
+)
+C6 <- EnrichmentBrowser::getGenesets(
+  org = "hsa",
+  db = "msigdb",
+  cat = "C6",
+  gene.id.type = "SYMBOL"
+)
+
+# combine genesets and convert genesets to be compatible with enricher
+gs <- c(H, C2, C6)
+gs.list <- do.call(rbind, lapply(names(gs), function(x) {
+  data.frame(gs = x, genes = gs[[x]])
+}))
+
+enrichresults <- regulonEnrich(
+  TF = c("GATA6", "NKX2-1"),
+  regulon = regulon,
+  weight = "weight",
+  weight_cutoff = 0,
+  genesets = gs.list
+)
+
+# plot results
+enrichPlot(results = enrichresults)
+```
+# Network analysis
+
+We can visualize the genesets as a network
+```{r plot gsea network}
+plotGseaNetwork(
+  tf = names(enrichresults),
+  enrichresults = enrichresults,
+  p.adj_cutoff = 0.1,
+  ntop_pathways = 10
+)
+```
+
+# Differential networks
+
+We are interested in understanding the differential networks between two conditions and determining which transcription factors account for the differences in the topology of networks. The pruned regulons with cluster-specific test statistics computed by `pruneRegulon` can be used to generate cluster-specific networks based on user-defined cutoffs and to visualize differential networks for transcription factors of interest. In this dataset, the GATA6 gene was only expressed in cluster 1 (C1) and NKX2-1 was only expressed in cluster 3 (C3). If we visualize the target genes of GATA6, we can see that C1 has many more target genes of GATA6 compared to C5, a cluster that does not express GATA6. Similarly, NKX2-1 target genes are confined to C3 which is the only cluster that exogenously expresses NKX2-1.
+
+```{r differential networks}
+plotDiffNetwork(regulon,
+  cutoff = 0,
+  tf = c("GATA6"),
+  weight = "weight",
+  clusters = c("C1", "C5"),
+  layout = "stress"
+)
+
+plotDiffNetwork(regulon,
+  cutoff = 0,
+  tf = c("NKX2-1"),
+  weight = "weight",
+  clusters = c("C3", "C5"),
+  layout = "stress"
+)
+```
+
+We can also visualize how transcription factors relate to other transcription factors in each cluster.
+```{r}
+selected <- which(regulon$weight[, "C1"] > 0 &
+  regulon$tf %in% c("GATA6", "FOXA1", "AR"))
+C1_network <- buildGraph(regulon[selected, ],
+  weights = "weight",
+  cluster = "C1"
+)
+selected <- which(regulon$weight[, "C5"] > 0 &
+  regulon$tf %in% c("GATA6", "FOXA1", "AR"))
+C5_network <- buildGraph(regulon[selected, ],
+  weights = "weight",
+  cluster = "C5"
+)
+plotEpiregulonNetwork(C1_network,
+  layout = "sugiyama",
+  tfs_to_highlight = c("GATA6", "FOXA1", "AR")
+) +
+  ggplot2::ggtitle("C1")
+
+plotEpiregulonNetwork(C5_network,
+  layout = "sugiyama",
+  tfs_to_highlight = c("GATA6", "FOXA1", "AR")
+) +
+  ggplot2::ggtitle("C5")
+```
+To systematically examine the differential network topology between two clusters, we perform an edge subtraction between two graphs, using weights computed by `pruneRegulon`. We then calculate the degree centrality of the weighted differential graphs and if desired, normalize the differential centrality against the total number of edges. The default normalization function is `sqrt` as it preserves both the difference in the number of edges (but scaled by sqrt) and the differences in the weights. If the user only wants to examine the differences in the averaged weights, the `FUN` argument can be changed to `identity`. Finally, we rank the transcription factors by (normalized) differential centrality.
+
+
+```{r}
+# rank by differential centrality
+C1_network <- buildGraph(regulon, weights = "weight", cluster = "C1")
+C5_network <- buildGraph(regulon, weights = "weight", cluster = "C5")
+
+diff_graph <- buildDiffGraph(C1_network, C5_network, abs_diff = FALSE)
+diff_graph <- addCentrality(diff_graph)
+diff_graph <- normalizeCentrality(diff_graph)
+rank_table <- rankTfs(diff_graph)
+
+library(ggplot2)
+ggplot(rank_table, aes(x = rank, y = centrality)) +
+  geom_point() +
+  ggrepel::geom_text_repel(data = rbind(head(rank_table, 5), tail(rank_table, 5)), aes(label = tf)) +
+  theme_classic()
+```
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
