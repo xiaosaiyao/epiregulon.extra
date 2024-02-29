@@ -82,7 +82,8 @@ getSigGenes <- function(da_list,
 
   direction <- match.arg(direction)
   classes <- names(da_list)
-  direction_factor <- c(down = -1, up = 1)[direction]
+  if (direction %in% c("up","down")) {
+    direction_factor <- c(down = -1, up = 1)[direction]}
 
   top.list <- lapply(seq_along(da_list), function(i){
     da_genes <- as.data.frame(da_list[[i]])
@@ -92,8 +93,9 @@ getSigGenes <- function(da_list,
 
       if (direction %in% c("up","down")) {
         logFC_cutoff <- round(stats::quantile(da_genes$summary.logFC*direction_factor, 0.95, na.rm=TRUE), digits = 1)
-      } else
+      } else{
         logFC_cutoff <- round(stats::quantile(abs(da_genes$summary.logFC), 0.95, na.rm=TRUE), digits = 1)
+      }
     }else {
       logFC_cutoff <- logFC_cutoff
     }
