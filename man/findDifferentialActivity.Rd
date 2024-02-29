@@ -9,7 +9,7 @@ findDifferentialActivity(
   clusters,
   test.type = "t",
   pval.type = "some",
-  direction = "up",
+  direction = c("any", "up", "down"),
   groups = deprecated(),
   ...
 )
@@ -23,7 +23,7 @@ findDifferentialActivity(
 
 \item{pval.type}{A string specifying how p-values are to be combined across pairwise comparisons for a given group/cluster.}
 
-\item{direction}{A string specifying direction of differential TF activity, can be "up" or "down"}
+\item{direction}{A string specifying direction of differential TF activity, can be "any", "up" or "down"}
 
 \item{groups}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} A character or integer vector of cluster or group labels for single cells}
 

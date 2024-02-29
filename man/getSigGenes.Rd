@@ -9,7 +9,7 @@ getSigGenes(
   fdr_cutoff = 0.05,
   logFC_cutoff = NULL,
   topgenes = NULL,
-  direction = "up"
+  direction = c("any", "up", "down")
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ getSigGenes(
 
 \item{topgenes}{A integer scalar to indicate the number of top ordered genes to include in output}
 
-\item{direction}{A string specifying direction for which differential TF activity was calculated, can be "up" or "down"}
+\item{direction}{A string specifying direction for which differential TF activity was calculated, can be "any", "up" or "down"}
 }
 \value{
 A compiled dataframe of TFs with differential activities across clusters/groups

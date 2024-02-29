@@ -43,9 +43,9 @@ an igraph plot of interconnected pathways through TFs
 Plot networks graph of significant genesets from regulonEnrich results
 }
 \examples{
-AR <- data.frame(ID = c("ANDROGEN RESPONSE","PROLIFERATION","MAPK"),
+AR <- data.frame(ID = c('ANDROGEN RESPONSE','PROLIFERATION','MAPK'),
 p.adjust = c(0.001, 0.01, 0.04))
-GATA6 <- data.frame(ID = c("STK33","PROLIFERATION","MAPK"),
+GATA6 <- data.frame(ID = c('STK33','PROLIFERATION','MAPK'),
 p.adjust = c(0.001, 0.01, 0.04))
 enrichresults <- list(AR = AR, GATA6 = GATA6)
 plotGseaNetwork(tf = names(enrichresults), enrichresults = enrichresults)

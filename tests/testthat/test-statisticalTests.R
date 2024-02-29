@@ -6,7 +6,7 @@ mu <- rnorm(n.tf*3, 1, runif(n.tf*3))
 X <- unlist(lapply(mu, function(x) rnorm(100,x,runif(1))))
 X.mat <- matrix(X, nrow=n.tf, ncol=n.cells, byrow = TRUE)
 rownames(X.mat) <- paste0("gene_", 1:50)
-da_genes <- findDifferentialActivity(X.mat, clusters = rep(1:3, each=100))
+da_genes <- findDifferentialActivity(X.mat, clusters = rep(1:3, each=100), direction = "up")
 res <- list()
 for(i in 1:3){
   threshold_logFC <- round(quantile(da_genes[[i]][,"summary.logFC"], 0.95),1)
@@ -21,7 +21,7 @@ for(i in 1:3){
 res <- do.call(rbind, res)
 
 test_that("getSigGenes works correctly", {
-  expect_identical(res, getSigGenes(da_genes))
+  expect_identical(res, getSigGenes(da_genes, direction = "up"))
 })
 
 da_genes <- findDifferentialActivity(X.mat, clusters = rep(1:3, each=100), direction = "down")
