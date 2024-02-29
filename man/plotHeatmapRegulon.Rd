@@ -46,7 +46,7 @@ plotHeatmapRegulon(
 
 \item{center}{Logical indicating whether to center the heatmap}
 
-\item{color_breaks}{\tA vector indicating numeric breaks as input to \code{circlize::colorRamp2}}
+\item{color_breaks}{A vector indicating numeric breaks as input to \code{circlize::colorRamp2}}
 
 \item{colors}{A vector of colors corresponding to values in \code{breaks} as input to \code{circlize::colorRamp2}}
 
