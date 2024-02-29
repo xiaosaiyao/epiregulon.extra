@@ -138,7 +138,7 @@ regulonEnrich_ <- function(TF,
     regulon.TF <- unique(regulon$target[which(regulon$tf ==
         TF & regulon[, corr] >
         corr_cutoff)])
-    if (length(intersect(regulon.TF, genesets$genes)) < 3) {
+    if (length(intersect(regulon.TF, genesets$genes)) < 3 | all(!genesets$genes %in% regulon.TF)) {
         results <- data.frame(p.adjust = NA,
             Description = NA, GeneRatio = 0,
             Odds.Ratio = NA)
