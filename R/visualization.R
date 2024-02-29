@@ -1,5 +1,3 @@
-
-
 plotActivityDim_ <- function(sce, activity_matrix, tf, dimtype,
     label, legend.label, colors, limit, ...) {
 
@@ -17,7 +15,6 @@ plotActivityDim_ <- function(sce, activity_matrix, tf, dimtype,
     return(g)
 
 }
-
 
 #' Plot cell-level reduced dimension results stored in a SingleCellExperiment object, colored by activities for a list of TFs
 #'
@@ -297,7 +294,6 @@ plotBubble <- function(activity_matrix, tf, clusters,
     return(g)
 }
 
-
 enrichPlot_ <- function(results, title, top) {
     results$logP.adj <- -log10(results$p.adjust)
     ggplot(results[seq_len(top), ], aes_string(y = "logP.adj",
@@ -375,8 +371,6 @@ enrichPlot <- function(results, top = 15, ncol = 3, title = NULL,
 
 }
 
-
-
 #' Plot targets genes of transcription factors in regulons
 #'
 #' @param sce A SingleCellExperiment object containing information of cell attributes
@@ -387,7 +381,7 @@ enrichPlot <- function(results, top = 15, ncol = 3, title = NULL,
 #' @param downsample Integer indicating the number of cells to sample from the matrix
 #' @param scale Logical indicating whether to scale the heatmap
 #' @param center Logical indicating whether to center the heatmap
-#' @param color_breaks \tA vector indicating numeric breaks as input to `circlize::colorRamp2`
+#' @param color_breaks A vector indicating numeric breaks as input to `circlize::colorRamp2`
 #' @param colors A vector of colors corresponding to values in `breaks` as input to `circlize::colorRamp2`
 #' @param cell_attributes A character vector matching the column names of `colData(sce)` to be used for plotting
 #' @param col_gap String indicating the cell attribute to split the columns of the heatmap by
@@ -510,7 +504,6 @@ plotHeatmapRegulon <- function(sce,
         ...)
 }
 
-
 #' Plot transcription factor activity
 #'
 #' @param activity_matrix A SingleCellExperiment object containing information of cell attributes
@@ -519,7 +512,7 @@ plotHeatmapRegulon <- function(sce,
 #' @param downsample Integer indicating the number of cells to sample from the matrix
 #' @param scale Logical indicating whether to scale the heatmap
 #' @param center Logical indicating whether to center the heatmap
-#' @param color_breaks \tA vector indicating numeric breaks as input to `circlize::colorRamp2`
+#' @param color_breaks A vector indicating numeric breaks as input to `circlize::colorRamp2`
 #' @param colors A vector of colors corresponding to values in `breaks` as input to `circlize::colorRamp2`
 #' @param cell_attributes A character vector matching the column names of `colData(sce)` to be used for plotting
 #' @param col_gap String indicating the cell attribute to split the columns of the heatmap by
@@ -575,8 +568,6 @@ plotHeatmapActivity <- function(activity_matrix, sce, tfs, downsample = 1000,
         show_column_names = show_column_names, ...)
 
 }
-
-
 
 #' @import ggplot2 ggbeeswarm
 plotDiagnostic <- function(idx, regulon, expMatrix, exp_assay,
