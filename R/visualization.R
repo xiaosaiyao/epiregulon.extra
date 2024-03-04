@@ -446,7 +446,6 @@ plotHeatmapRegulon <- function(sce,
 
     regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
 
-
     # remove duplicated genes from each tf
     for (tf in names(regulon.split)) {
       regulon.split[[tf]] <- regulon.split[[tf]][!duplicated(regulon.split[[tf]]$target), ]
@@ -458,8 +457,7 @@ plotHeatmapRegulon <- function(sce,
     regulon <- regulon[regulon$target %in% rownames(sce),]
     targets <- regulon$target
 
-    sce <- sce[targets,
-        downsample_seq]
+    sce <- sce[targets, downsample_seq]
 
 
     right_annotation <- data.frame(tf = regulon$tf)
