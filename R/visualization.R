@@ -436,9 +436,11 @@ plotHeatmapRegulon <- function(sce,
 
     # keep only targets belonging to TFs and meeting cutoff
     if (is.matrix(regulon[[regulon_column]])) {
-        regulon <- regulon[regulon$tf %in% tfs &
+
+        regulon <- regulon[which(regulon$tf %in% tfs &
                              apply(regulon[[regulon_column]], 1,
-                                   function(x) any(x > regulon_cutoff)), ]
+                                   function(x) any(x > regulon_cutoff))), ]
+
     } else {
         regulon <- regulon[regulon$tf %in% tfs &
                              regulon[,regulon_column] > regulon_cutoff, ,drop=FALSE]
@@ -534,7 +536,7 @@ plotHeatmapActivity <- function(activity_matrix, sce, tfs, downsample = 1000,
     cluster_rows = TRUE, cluster_columns = FALSE, border = TRUE,
     show_column_names = FALSE, ...) {
 
-
+    tfs <- tfs[tfs %in% rownames(activity_matrix)]
     downsample_seq <- seq(from = 1, to = ncol(sce), by = floor(max(1,
         ncol(sce)/downsample)))
 
