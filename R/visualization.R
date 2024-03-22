@@ -435,11 +435,10 @@ plotHeatmapRegulon <- function(sce,
 
     # keep only targets belonging to TFs and meeting cutoff
     if (is.matrix(regulon[[regulon_column]])) {
-        regulon <- regulon[regulon$tf %in%
-            tfs & apply(regulon[[regulon_column]],
-            1, function(x) any(x >
-                regulon_cutoff)),
-            ]
+
+        regulon <- regulon[which(regulon$tf %in% tfs &
+                             apply(regulon[[regulon_column]], 1,
+                                   function(x) any(x > regulon_cutoff))), ]
     } else {
         regulon <- regulon[regulon$tf %in%
             tfs & regulon[,
@@ -448,14 +447,14 @@ plotHeatmapRegulon <- function(sce,
             ]
     }
 
-    regulon <- regulon[order(regulon$tf),
-        ]
+    regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
 
     # remove duplicated genes from each tf
-    for (tf in stats::na.omit(unique(regulon$tf))) {
-        regulon <- regulon[!duplicated(regulon$target[regulon$tf ==
-            tf]), ]
+    for (tf in names(regulon.split)) {
+      regulon.split[[tf]] <- regulon.split[[tf]][!duplicated(regulon.split[[tf]]$target), ]
     }
+
+    regulon <- do.call(rbind, as.list(regulon.split))
 
     # remove targets not found in sce
     regulon <- regulon[regulon$target %in%
@@ -463,8 +462,7 @@ plotHeatmapRegulon <- function(sce,
         ]
     targets <- regulon$target
 
-    sce <- sce[targets,
-        downsample_seq]
+    sce <- sce[targets, downsample_seq]
 
 
     right_annotation <- data.frame(tf = regulon$tf)
@@ -541,7 +539,7 @@ plotHeatmapActivity <- function(activity_matrix, sce, tfs, downsample = 1000,
     cluster_rows = TRUE, cluster_columns = FALSE, border = TRUE,
     show_column_names = FALSE, ...) {
 
-
+    tfs <- tfs[tfs %in% rownames(activity_matrix)]
     downsample_seq <- seq(from = 1, to = ncol(sce), by = floor(max(1,
         ncol(sce)/downsample)))
 

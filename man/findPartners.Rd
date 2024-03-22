@@ -22,3 +22,10 @@ factor and the element wise product of both weight columns.
 \description{
 Find interaction partners of a transcription factor of interest
 }
+\examples{
+regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
+target = sample(letters[5:14], 100, replace = TRUE))
+regulon$weights <- runif(100)
+GRN_graph <- buildGraph(regulon)
+partners <- findPartners(GRN_graph, 'a')
+}

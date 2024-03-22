@@ -1,11 +1,11 @@
 #' Test for differential TF activity between pairs of single cell clusters/groups
 #'
 #' @param activity_matrix A matrix of TF activities inferred from calculateActivity
-#' @param groups `r lifecycle::badge('deprecated')` A character or integer vector of cluster or group labels for single cells
+#' @param groups `r lifecycle::badge("deprecated")` A character or integer vector of cluster or group labels for single cells
 #' @param clusters A character or integer vector of cluster or group labels for single cells
-#' @param test.type String indicating the type of statistical tests to be passed to scran::findMarkers, can be 't', 'wilcox'. or 'binom'
+#' @param test.type String indicating the type of statistical tests to be passed to scran::findMarkers, can be "t", "wilcox". or "binom"
 #' @param pval.type A string specifying how p-values are to be combined across pairwise comparisons for a given group/cluster.
-#' @param direction A string specifying direction of differential TF activity, can be 'up' or 'down'
+#' @param direction A string specifying direction of differential TF activity, can be "any", "up" or "down"
 #' @param ... Further arguments to pass to scran::findMarkers
 #'
 #' @return A named list of dataframes containing differential TF activity test results for each cluster/group
@@ -17,33 +17,37 @@
 #' @examples
 #' set.seed(1)
 #' score.combine <- cbind(matrix(runif(2000,0,2), 20,100), matrix(runif(2000,0,10), 20,100))
-#' rownames(score.combine) <- paste0('TF',1:20)
-#' colnames(score.combine) <- paste0('cell',1:200)
+#' rownames(score.combine) <- paste0("TF",1:20)
+#' colnames(score.combine) <- paste0("cell",1:200)
 #' cluster <- c(rep(1,100),rep(2,100))
 #' markers <- findDifferentialActivity(
 #' activity_matrix = score.combine,
 #' clusters = cluster,
-#' pval.type = 'some',
-#' direction = 'up',
-#' test.type = 't')
+#' pval.type = "some",
+#' direction = "up",
+#' test.type = "t")
 #' sig.genes <- getSigGenes(markers, fdr_cutoff = 1, logFC_cutoff = 0.1)
 #' @author Xiaosai Yao, Shang-yang Chen
 
-findDifferentialActivity <- function(activity_matrix, clusters,
-    test.type = "t", pval.type = "some", direction = "up",
-    groups = deprecated(), ...) {
+findDifferentialActivity <- function(activity_matrix,
+                                     clusters,
+                                     test.type = "t",
+                                     pval.type = "some",
+                                     direction = c("any","up","down"),
+                                     groups = deprecated(),
+                                     ...){
 
-    if (lifecycle::is_present(groups)) {
-        lifecycle::deprecate_warn("0.99.0", "findDifferentialActivity(groups)",
-            "findDifferentialActivity(clusters)")
-        clusters <- groups
-    }
+  if(lifecycle::is_present(groups)){
+    lifecycle::deprecate_warn( "1.0.0", "findDifferentialActivity(groups)",
+                               "findDifferentialActivity(clusters)")
+    clusters <- groups
+  }
 
-    activity_matrix <- stats::na.omit(as.matrix(activity_matrix))
-    tf_markers <- scran::findMarkers(activity_matrix, clusters,
-        test.type = test.type, pval.type = pval.type, direction = direction,
-        ...)
-    return(tf_markers)
+  direction <- match.arg(direction)
+  activity_matrix <- stats::na.omit(as.matrix(activity_matrix))
+  tf_markers <- scran::findMarkers(activity_matrix, clusters, test.type=test.type,
+                                   pval.type=pval.type, direction=direction, ...)
+  return(tf_markers)
 
 }
 
@@ -53,7 +57,7 @@ findDifferentialActivity <- function(activity_matrix, clusters,
 #' @param fdr_cutoff A numeric scalar to specify the cutoff for FDR value. Default is 0.05
 #' @param logFC_cutoff A numeric scalar to specify the cutoff for log fold change.
 #' @param topgenes A integer scalar to indicate the number of top ordered genes to include in output
-#' @param direction A string specifying direction for which differential TF activity was calculated, can be 'up' or 'down'
+#' @param direction A string specifying direction for which differential TF activity was calculated, can be "any", "up" or "down"
 #'
 #' @return A compiled dataframe of TFs with differential activities across clusters/groups
 #' @export
@@ -61,61 +65,73 @@ findDifferentialActivity <- function(activity_matrix, clusters,
 #' @examples
 #' set.seed(1)
 #' score.combine <- cbind(matrix(runif(2000,0,2), 20,100), matrix(runif(2000,0,10), 20,100))
-#' rownames(score.combine) <- paste0('TF',1:20)
-#' colnames(score.combine) <- paste0('cell',1:200)
+#' rownames(score.combine) <- paste0("TF",1:20)
+#' colnames(score.combine) <- paste0("cell",1:200)
 #' cluster <- c(rep(1,100),rep(2,100))
-#' markers <- findDifferentialActivity(score.combine, cluster, pval.type = 'some', direction = 'up',
-#' test.type = 't')
+#' markers <- findDifferentialActivity(score.combine, cluster, pval.type = "some", direction = "up",
+#' test.type = "t")
 #' sig.genes <- getSigGenes(markers, fdr_cutoff = 1, logFC_cutoff = 0.1)
 #' utils::head(sig.genes)
 #' @author Xiaosai Yao, Shang-yang Chen
 
-getSigGenes <- function(da_list, fdr_cutoff = 0.05, logFC_cutoff = NULL,
-    topgenes = NULL, direction = "up") {
-    stopifnot(direction %in% c("down", "up"))
-    classes <- names(da_list)
-    direction_factor <- c(down = -1, up = 1)[direction]
-    top.list <- lapply(seq_along(da_list), function(i) {
-        da_genes <- as.data.frame(da_list[[i]])
-        da_genes <- da_genes[, c("p.value", "FDR", "summary.logFC")]
+getSigGenes <- function(da_list,
+                        fdr_cutoff = 0.05,
+                        logFC_cutoff = NULL,
+                        topgenes = NULL,
+                        direction = c("any","up","down")){
 
-        if (is.null(logFC_cutoff)) {
-            logFC_cutoff <- round(stats::quantile(da_genes$summary.logFC *
-                direction_factor, 0.95, na.rm = TRUE), digits = 1)
-        } else {
-            logFC_cutoff <- logFC_cutoff
-        }
-        message("Using a logFC cutoff of ", logFC_cutoff, " for class ",
-            classes[i])
-        da_genes <- da_genes[which(da_genes[, "FDR"] < fdr_cutoff &
-            da_genes[, 3] * direction_factor > logFC_cutoff), ]
+  direction <- match.arg(direction)
+  classes <- names(da_list)
+  if (direction %in% c("up","down")) {
+    direction_factor <- c(down = -1, up = 1)[direction]}
 
-        if (nrow(da_genes) != 0) {
-            da_genes$class <- classes[[i]]
-            da_genes$tf <- rownames(da_genes)
-            rownames(da_genes) <- NULL
-        }
+  top.list <- lapply(seq_along(da_list), function(i){
+    da_genes <- as.data.frame(da_list[[i]])
+    da_genes <- da_genes[,c("p.value","FDR","summary.logFC")]
 
-        if (is.null(topgenes)) {
+    if (is.null(logFC_cutoff)){
 
-            da_genes <- da_genes[order(da_genes$FDR, -direction_factor *
-                (da_genes[, 3])), ]
-        } else {
-            da_genes <- da_genes[utils::head(order(da_genes$FDR,
-                -direction_factor * (da_genes[, 3])), topgenes),
-                ]
-        }
-        # print(da_genes)
+      if (direction %in% c("up","down")) {
+        logFC_cutoff <- round(stats::quantile(da_genes$summary.logFC*direction_factor, 0.95, na.rm=TRUE), digits = 1)
+      } else{
+        logFC_cutoff <- round(stats::quantile(abs(da_genes$summary.logFC), 0.95, na.rm=TRUE), digits = 1)
+      }
+    }else {
+      logFC_cutoff <- logFC_cutoff
+    }
+
+    message ("Using a logFC cutoff of ", logFC_cutoff, " for class ", classes[i], " for direction equal to ", direction)
+
+    if (direction %in% c("up","down")) {
+      da_genes <- da_genes[which(da_genes[,"FDR"] < fdr_cutoff & da_genes[, 3]*direction_factor > logFC_cutoff), ]
+    } else {
+      da_genes <- da_genes[which(da_genes[,"FDR"] < fdr_cutoff & abs(da_genes[, 3]) > logFC_cutoff), ]
+    }
 
 
-        return(da_genes)
-    })
+    if (nrow(da_genes) != 0){
+      da_genes$class <- classes[[i]]
+      da_genes$tf <- rownames(da_genes); rownames(da_genes) <- NULL
+    }
 
-    # print(top.list)
+    if (is.null(topgenes)){
 
-    return(do.call(rbind, top.list))
+      da_genes <- da_genes[order(da_genes$FDR, -(da_genes[, 3])),]
+    } else {
+      da_genes <- da_genes[utils::head(order(da_genes$FDR, -(da_genes[, 3])), topgenes),]
+    }
+    #print(da_genes)
+
+
+    return(da_genes)
+  })
+
+  #print(top.list)
+
+  return(do.call(rbind, top.list))
 
 }
+
 
 regulonEnrich_ <- function(TF,
     regulon, corr, corr_cutoff,
@@ -124,7 +140,7 @@ regulonEnrich_ <- function(TF,
     regulon.TF <- unique(regulon$target[which(regulon$tf ==
         TF & regulon[, corr] >
         corr_cutoff)])
-    if (length(intersect(regulon.TF, genesets$genes)) < 3) {
+    if (length(intersect(regulon.TF, genesets$genes)) < 3 | all(!genesets$genes %in% regulon.TF)) {
         results <- data.frame(p.adjust = NA,
             Description = NA, GeneRatio = 0,
             Odds.Ratio = NA)

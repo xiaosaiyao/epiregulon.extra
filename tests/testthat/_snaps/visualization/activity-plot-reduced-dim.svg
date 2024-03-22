@@ -278,20 +278,20 @@
 <text x='164.96' y='562.05' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.69px' lengthAdjust='spacingAndGlyphs'>UMAP 1</text>
 <text transform='translate(19.72,292.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.69px' lengthAdjust='spacingAndGlyphs'>UMAP 2</text>
 <rect x='302.75' y='234.69' width='53.90' height='115.08' style='stroke-width: 1.16; stroke: none; fill: #FFFFFF;' />
+<text x='308.73' y='250.17' style='font-size: 12.00px; font-family: sans;' textLength='36.68px' lengthAdjust='spacingAndGlyphs'>activity</text>
 <image width='17.28' height='86.40' x='308.73' y='257.40' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA6klEQVQ4jaWRwW6EMAxEn03V/v/XVm3BswdEEoPD7qoX5Ngzz5OAhBx9sX/EJ44+2mfBpQWHBUfeen4cOaqxZ7lno1j7sfVkuOi67rWGsmbzoteOWKbYkaBywAVQUeoYhiMm4uaQmJEpxHkwrKwoXPKddeUtq8xMEhSADh3vSx3jmfhEnsXgmmoUX7e9oHsPsD/7P8kaHuIOOo2h/BAjJXu7pHJk8eC4pdSDRKmupbxcxf9VsfzsnfKKfBJ4zAGGR0GJLI4cI16pDsppEGVleEQabL2K1NuiV4avAb626k+G/wb4Txj+HQBID2phqW/6dj8AAAAAAElFTkSuQmCC'/>
+<polyline points='322.56,329.71 326.01,329.71 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='322.56,306.88 326.01,306.88 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='322.56,284.06 326.01,284.06 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='322.56,261.24 326.01,261.24 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='312.19,329.71 308.73,329.71 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='312.19,306.88 308.73,306.88 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='312.19,284.06 308.73,284.06 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='312.19,261.24 308.73,261.24 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='331.99' y='333.01' style='font-size: 9.60px; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>2.5</text>
 <text x='331.99' y='310.19' style='font-size: 9.60px; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>5.0</text>
 <text x='331.99' y='287.37' style='font-size: 9.60px; font-family: sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>7.5</text>
 <text x='331.99' y='264.54' style='font-size: 9.60px; font-family: sans;' textLength='18.69px' lengthAdjust='spacingAndGlyphs'>10.0</text>
-<text x='308.73' y='250.17' style='font-size: 12.00px; font-family: sans;' textLength='36.68px' lengthAdjust='spacingAndGlyphs'>activity</text>
-<line x1='308.73' y1='329.71' x2='312.19' y2='329.71' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='308.73' y1='306.88' x2='312.19' y2='306.88' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='308.73' y1='284.06' x2='312.19' y2='284.06' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='308.73' y1='261.24' x2='312.19' y2='261.24' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='322.56' y1='329.71' x2='326.01' y2='329.71' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='322.56' y1='306.88' x2='326.01' y2='306.88' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='322.56' y1='284.06' x2='326.01' y2='284.06' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='322.56' y1='261.24' x2='326.01' y2='261.24' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='164.96' y='38.67' text-anchor='middle' style='font-size: 14.40px; font-family: sans;' textLength='75.28px' lengthAdjust='spacingAndGlyphs'>Gene_0001</text>
 </g>
 <defs>
@@ -543,23 +543,23 @@
 <text x='522.11' y='562.05' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.69px' lengthAdjust='spacingAndGlyphs'>UMAP 1</text>
 <text transform='translate(376.87,292.23) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='44.69px' lengthAdjust='spacingAndGlyphs'>UMAP 2</text>
 <rect x='659.90' y='234.69' width='48.64' height='115.08' style='stroke-width: 1.16; stroke: none; fill: #FFFFFF;' />
+<text x='665.88' y='250.17' style='font-size: 12.00px; font-family: sans;' textLength='36.68px' lengthAdjust='spacingAndGlyphs'>activity</text>
 <image width='17.28' height='86.40' x='665.88' y='257.40' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAA6klEQVQ4jaWRwW6EMAxEn03V/v/XVm3BswdEEoPD7qoX5Ngzz5OAhBx9sX/EJ44+2mfBpQWHBUfeen4cOaqxZ7lno1j7sfVkuOi67rWGsmbzoteOWKbYkaBywAVQUeoYhiMm4uaQmJEpxHkwrKwoXPKddeUtq8xMEhSADh3vSx3jmfhEnsXgmmoUX7e9oHsPsD/7P8kaHuIOOo2h/BAjJXu7pHJk8eC4pdSDRKmupbxcxf9VsfzsnfKKfBJ4zAGGR0GJLI4cI16pDsppEGVleEQabL2K1NuiV4avAb626k+G/wb4Txj+HQBID2phqW/6dj8AAAAAAElFTkSuQmCC'/>
+<polyline points='679.71,343.65 683.16,343.65 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.71,322.51 683.16,322.51 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.71,301.37 683.16,301.37 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.71,280.23 683.16,280.23 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='679.71,259.10 683.16,259.10 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.34,343.65 665.88,343.65 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.34,322.51 665.88,322.51 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.34,301.37 665.88,301.37 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.34,280.23 665.88,280.23 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='669.34,259.10 665.88,259.10 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='689.14' y='346.95' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>0</text>
 <text x='689.14' y='325.82' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='689.14' y='304.68' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>4</text>
 <text x='689.14' y='283.54' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>6</text>
 <text x='689.14' y='262.40' style='font-size: 9.60px; font-family: sans;' textLength='5.34px' lengthAdjust='spacingAndGlyphs'>8</text>
-<text x='665.88' y='250.17' style='font-size: 12.00px; font-family: sans;' textLength='36.68px' lengthAdjust='spacingAndGlyphs'>activity</text>
-<line x1='665.88' y1='343.65' x2='669.34' y2='343.65' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.88' y1='322.51' x2='669.34' y2='322.51' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.88' y1='301.37' x2='669.34' y2='301.37' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.88' y1='280.23' x2='669.34' y2='280.23' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='665.88' y1='259.10' x2='669.34' y2='259.10' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.71' y1='343.65' x2='683.16' y2='343.65' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.71' y1='322.51' x2='683.16' y2='322.51' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.71' y1='301.37' x2='683.16' y2='301.37' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.71' y1='280.23' x2='683.16' y2='280.23' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='679.71' y1='259.10' x2='683.16' y2='259.10' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='522.11' y='38.67' text-anchor='middle' style='font-size: 14.40px; font-family: sans;' textLength='75.28px' lengthAdjust='spacingAndGlyphs'>Gene_0002</text>
 <text x='11.46' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='143.08px' lengthAdjust='spacingAndGlyphs'>Activity plot reduced dim</text>
 </g>

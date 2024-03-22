@@ -9,7 +9,7 @@ getSigGenes(
   fdr_cutoff = 0.05,
   logFC_cutoff = NULL,
   topgenes = NULL,
-  direction = "up"
+  direction = c("any", "up", "down")
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ getSigGenes(
 
 \item{topgenes}{A integer scalar to indicate the number of top ordered genes to include in output}
 
-\item{direction}{A string specifying direction for which differential TF activity was calculated, can be 'up' or 'down'}
+\item{direction}{A string specifying direction for which differential TF activity was calculated, can be "any", "up" or "down"}
 }
 \value{
 A compiled dataframe of TFs with differential activities across clusters/groups
@@ -32,11 +32,11 @@ Compile and summarize the output from findDifferentialActivity function
 \examples{
 set.seed(1)
 score.combine <- cbind(matrix(runif(2000,0,2), 20,100), matrix(runif(2000,0,10), 20,100))
-rownames(score.combine) <- paste0('TF',1:20)
-colnames(score.combine) <- paste0('cell',1:200)
+rownames(score.combine) <- paste0("TF",1:20)
+colnames(score.combine) <- paste0("cell",1:200)
 cluster <- c(rep(1,100),rep(2,100))
-markers <- findDifferentialActivity(score.combine, cluster, pval.type = 'some', direction = 'up',
-test.type = 't')
+markers <- findDifferentialActivity(score.combine, cluster, pval.type = "some", direction = "up",
+test.type = "t")
 sig.genes <- getSigGenes(markers, fdr_cutoff = 1, logFC_cutoff = 0.1)
 utils::head(sig.genes)
 }
