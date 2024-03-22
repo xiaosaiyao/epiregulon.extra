@@ -47,6 +47,7 @@ Suggests:
     scuttle,
     vdiffr
 VignetteBuilder: knitr
-URL:
+URL: https://github.com/xiaosaiyao/epiregulon.extra/
 biocViews: GeneExpression, Transcription, ChipOnChip, DifferentialExpression, GeneTarget, Normalization, GraphAndNetwork
 Config/testthat/edition: 3
+BugReports: https://github.com/xiaosaiyao/epiregulon.extra/issues
