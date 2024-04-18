@@ -130,7 +130,7 @@ ActivityPlot <- plotActivityDim(
 )
 
 for(i in seq_len(length(ActivityPlot))){
-    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =40)
 }
 ActivityPlot
 ```
@@ -150,7 +150,7 @@ ActivityPlot <- plotActivityDim(
   legend.label = "GEX"
 )
 for(i in seq_len(length(ActivityPlot))){
-    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =50)
+    ActivityPlot[[i]] <- ggrastr::rasterise(ActivityPlot[[i]], dpi =40)
 }
 ActivityPlot
 ```
@@ -168,7 +168,7 @@ plotHeatmapRegulon(
   exprs_values = "normalizedCounts",
   name = "regulon heatmap",
   column_title_rot = 45,
-  raster_quality=4
+  raster_quality=3
 )
 ```
 
@@ -182,7 +182,7 @@ plotHeatmapActivity(
   col_gap = "hash_assignment",
   name = "Activity",
   column_title_rot = 45,
-  raster_quality=4
+  raster_quality=3
 )
 ```
 # Geneset enrichment
