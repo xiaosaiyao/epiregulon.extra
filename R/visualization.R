@@ -414,10 +414,11 @@ plotHeatmapRegulon <- function(sce,
     tfs, regulon, regulon_column = "weight",
     regulon_cutoff = 0.1,
     downsample = 1000,
-    scale = TRUE, center = TRUE,
+    scale = TRUE,
+    center = TRUE,
     color_breaks = c(-2,
-        0, 2), colors = c("blue",
-        "white", "red"),
+        0, 2),
+    colors = c("blue","white", "red"),
     cell_attributes, col_gap = NULL,
     exprs_values = "logcounts",
     use_raster = TRUE,
@@ -439,12 +440,10 @@ plotHeatmapRegulon <- function(sce,
         regulon <- regulon[which(regulon$tf %in% tfs &
                              apply(regulon[[regulon_column]], 1,
                                    function(x) any(x > regulon_cutoff))), ]
+
     } else {
-        regulon <- regulon[regulon$tf %in%
-            tfs & regulon[,
-            regulon_column] >
-            regulon_cutoff,
-            ]
+        regulon <- regulon[regulon$tf %in% tfs &
+                             regulon[,regulon_column] > regulon_cutoff, ,drop=FALSE]
     }
 
     regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
@@ -457,9 +456,7 @@ plotHeatmapRegulon <- function(sce,
     regulon <- do.call(rbind, as.list(regulon.split))
 
     # remove targets not found in sce
-    regulon <- regulon[regulon$target %in%
-        rownames(sce),
-        ]
+    regulon <- regulon[regulon$target %in% rownames(sce),]
     targets <- regulon$target
 
     sce <- sce[targets, downsample_seq]
