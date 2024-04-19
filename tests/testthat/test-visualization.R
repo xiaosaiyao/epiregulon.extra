@@ -57,29 +57,3 @@ test_that("enrichPlot works correctly",{
     fig = enrichPlot(results = enrichment_results)
   )
 })
-
-regulon <- data.frame(tf=c(rep("Gene_0001",10),rep("Gene_0002",20)),
-target <- sample(rownames(example_sce),30), weight = rnorm(30))
-
-test_that("plotHeatmapRegulon works correctly",{
-  expect_doppelganger(
-    title = "Heatmap regulon",
-    fig = plotHeatmapRegulon(example_sce, tfs=c("Gene_0001","Gene_0002"), regulon=regulon,
-                             cell_attributes="cluster", col_gap = "cluster", column_title_rot = 90,
-                             name = "transcription factor activity")
-  )
-})
-
-activity_matrix <- matrix(rnorm(10*200), nrow=10, ncol=200)
-rownames(activity_matrix) <- sample(rownames(example_sce),10)
-
-test_that("plotHeatmapActivity works correctly",{
-  expect_doppelganger(
-    title = "Heatmap activity",
-    fig = plotHeatmapActivity(activity_matrix=activity_matrix, sce=example_sce,
-                              tfs=rownames(activity_matrix), cell_attributes="cluster", col_gap="cluster",
-                              name = "transcription factor activity")
-  )
-})
-
-

@@ -155,8 +155,9 @@ for(i in seq_len(length(ActivityPlot))){
 ActivityPlot
 ```
 
-Visualize the gene expression of the regulons by heatmap
-```{r}
+Visualize the activity of the selected transcription factors by heatmap. Due to the maximum size limit for this vignette, the output is not shown here.
+
+```{r eval=FALSE}
 plotHeatmapRegulon(
   sce = GeneExpressionMatrix,
   tfs = c("GATA6", "NKX2-1"),
@@ -168,11 +169,10 @@ plotHeatmapRegulon(
   exprs_values = "normalizedCounts",
   name = "regulon heatmap",
   column_title_rot = 45,
-  raster_quality=3
+  raster_quality=4
 )
-```
 
-```{r}
+
 plotHeatmapActivity(
   activity = score.combine,
   sce = GeneExpressionMatrix,
@@ -185,6 +185,7 @@ plotHeatmapActivity(
   raster_quality=3
 )
 ```
+
 # Geneset enrichment
 
 Sometimes we are interested to know what pathways are enriched in the regulon of a particular TF. We can perform geneset enrichment using the enricher function from [clusterProfiler](http://yulab-smu.top/biomedical-knowledge-mining-book/universal-api.html).
@@ -261,7 +262,7 @@ plotDiffNetwork(regulon,
 )
 ```
 
-We can also visualize how transcription factors relate to other transcription factors in each cluster.
+We can also visualize how transcription factors relate to other transcription factors in C1 cluster.
 ```{r}
 selected <- which(regulon$weight[, "C1"] > 0 &
   regulon$tf %in% c("GATA6", "FOXA1", "AR"))
@@ -269,24 +270,14 @@ C1_network <- buildGraph(regulon[selected, ],
   weights = "weight",
   cluster = "C1"
 )
-selected <- which(regulon$weight[, "C5"] > 0 &
-  regulon$tf %in% c("GATA6", "FOXA1", "AR"))
-C5_network <- buildGraph(regulon[selected, ],
-  weights = "weight",
-  cluster = "C5"
-)
 plotEpiregulonNetwork(C1_network,
   layout = "sugiyama",
   tfs_to_highlight = c("GATA6", "FOXA1", "AR")
 ) +
   ggplot2::ggtitle("C1")
-
-plotEpiregulonNetwork(C5_network,
-  layout = "sugiyama",
-  tfs_to_highlight = c("GATA6", "FOXA1", "AR")
-) +
-  ggplot2::ggtitle("C5")
 ```
+The same can be done for the cluster C5.
+
 To systematically examine the differential network topology between two clusters, we perform an edge subtraction between two graphs, using weights computed by `pruneRegulon`. We then calculate the degree centrality of the weighted differential graphs and if desired, normalize the differential centrality against the total number of edges. The default normalization function is `sqrt` as it preserves both the difference in the number of edges (but scaled by sqrt) and the differences in the weights. If the user only wants to examine the differences in the averaged weights, the `FUN` argument can be changed to `identity`. Finally, we rank the transcription factors by (normalized) differential centrality.
 
 
