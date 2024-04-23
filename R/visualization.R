@@ -28,14 +28,15 @@ plotActivityDim_ <- function(sce, activity_matrix, tf, dimtype,
 #' @param title A string to specify the name of the combined plot
 #' @param combine logical to indicate whether to combine and visualize the plots in one panel
 #' @param legend.label String indicating the name of variable to be plotted on the legend
-#' @param colors A vector of 2 colors for the intensity, with the first element refering to the lower value and
-#' the second elment refering to the higher value. Default is c('blue','yellow').
+#' @param colors A vector of 2 colors for the intensity, with the first element referring to the lower value and
+#' the second element referring to the higher value. Default is c('blue','yellow').
 #' @param limit A vector of lower and upper bounds for the color scale. The default option is NULL and will adjust
 #' to minimal and maximal values
 #' @param ... Additional arguments from scater::plotReducedDim
 #'
 #' @return A combined ggplot object or a list of ggplots if combine == FALSE
-#' @import SingleCellExperiment
+#' @importFrom SummarizedExperiment colData
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @export
 #'
 #' @examples
@@ -105,8 +106,8 @@ plotActivityViolin_ <- function(activity_matrix, tf, clusters,
     }
 
 
-    g <- ggplot2::ggplot(df, aes_string(x = "clusters",
-        y = "activity", fill = "clusters")) + geom_violin() +
+    g <- ggplot2::ggplot(df, aes(x = clusters,
+        y = activity, fill = clusters)) + geom_violin() +
         theme_classic(base_size = 12) + ggtitle(tf) + ylab(legend.label) +
         theme(legend.position = "none", plot.title = element_text(hjust = 0.5),
             axis.text.x = element_text(angle = 90, hjust = 1))
@@ -270,9 +271,9 @@ plotBubble <- function(activity_matrix, tf, clusters,
         max.logpval <- max(logpval[is.finite(logpval)])
         logpval <- replace(logpval, is.infinite(logpval),
             max.logpval)
-        g <- ggplot2::ggplot(df.plot, aes_string("clusters",
-            "tf", color = "relative_activity")) +
-            geom_point(stat = "identity", aes_string(size = "logpval")) +
+        g <- ggplot2::ggplot(df.plot, aes(clusters,
+            tf, color = relative_activity)) +
+            geom_point(stat = "identity", aes(size = logpval)) +
             scale_color_viridis_c(option = color.theme) +
             scale_size_continuous("-logpval", range = c(0,
                 7)) + theme_classic(base_size = 12) +
@@ -281,9 +282,9 @@ plotBubble <- function(activity_matrix, tf, clusters,
             ylab(y.label) + xlab(x.label) + ylab(y.label) +
             xlab(x.label) + ggtitle(title)
     } else if (bubblesize == "summary.logFC") {
-        g <- ggplot2::ggplot(df.plot, aes_string("clusters",
-            "tf", color = "relative_activity")) +
-            geom_point(stat = "identity", aes_string(size = "summary.logFC")) +
+        g <- ggplot2::ggplot(df.plot, aes(clusters,
+            tf, color = relative_activity)) +
+            geom_point(stat = "identity", aes(size = summary.logFC)) +
             scale_color_viridis_c(option = color.theme) +
             scale_size_continuous("-logpval", range = c(0,
                 7)) + theme_classic(base_size = 12) +
@@ -296,10 +297,10 @@ plotBubble <- function(activity_matrix, tf, clusters,
 
 enrichPlot_ <- function(results, title, top) {
     results$logP.adj <- -log10(results$p.adjust)
-    ggplot(results[seq_len(top), ], aes_string(y = "logP.adj",
-        x = "Description", color = "GeneRatio")) +
+    ggplot(results[seq_len(top), ], aes(y = logP.adj,
+        x = Description, color = GeneRatio)) +
         scale_colour_gradient(high = "red", low = "blue") +
-        geom_point(stat = "identity", aes_string(size = "Odds.Ratio")) +
+        geom_point(stat = "identity", aes(size = Odds.Ratio)) +
         coord_flip() + theme_bw() + ggtitle(title) +
         ylab(expression("-log"[10] ~ "pval")) +
         theme(text = element_text(size = 10),
@@ -315,7 +316,7 @@ enrichPlot_ <- function(results, title, top) {
 #'
 #' @param results  Output from regulonEnrich
 #' @param top An integer to indicate the number of pathways to plot ranked by significance. Default is 15.
-#' @param ncol An integer to indciate the number of columns in the combined plot, if combine == TRUE. Default is 3.
+#' @param ncol An integer to indicate the number of columns in the combined plot, if combine == TRUE. Default is 3.
 #' @param title String indicating the title of the combined plot
 #' @param combine logical to indicate whether to combine and visualize the plots in one panel
 #'
@@ -449,9 +450,7 @@ plotHeatmapRegulon <- function(sce,
     regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
 
     # remove duplicated genes from each tf
-    for (tf in names(regulon.split)) {
-      regulon.split[[tf]] <- regulon.split[[tf]][!duplicated(regulon.split[[tf]]$target), ]
-    }
+    lapply(regulon.split, function(x) x[!duplicated(x$target), ])
 
     regulon <- do.call(rbind, as.list(regulon.split))
 

@@ -11,7 +11,7 @@ enrichPlot(results, top = 15, ncol = 3, title = NULL, combine = TRUE)
 
 \item{top}{An integer to indicate the number of pathways to plot ranked by significance. Default is 15.}
 
-\item{ncol}{An integer to indciate the number of columns in the combined plot, if combine == TRUE. Default is 3.}
+\item{ncol}{An integer to indicate the number of columns in the combined plot, if combine == TRUE. Default is 3.}
 
 \item{title}{String indicating the title of the combined plot}
 

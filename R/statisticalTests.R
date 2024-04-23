@@ -120,13 +120,11 @@ getSigGenes <- function(da_list,
     } else {
       da_genes <- da_genes[utils::head(order(da_genes$FDR, -(da_genes[, 3])), topgenes),]
     }
-    #print(da_genes)
 
 
     return(da_genes)
   })
 
-  #print(top.list)
 
   return(do.call(rbind, top.list))
 

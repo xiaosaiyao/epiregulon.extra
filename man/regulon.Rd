@@ -3,7 +3,7 @@
 \docType{data}
 \name{regulon}
 \alias{regulon}
-\title{regulon created using \code{epiregulon} package from reprogam-seq data}
+\title{regulon created using \code{epiregulon} package from reprogram-seq data}
 \format{
 a DFrame.
 }
@@ -14,7 +14,7 @@ data(regulon)
 a DFrame.
 }
 \description{
-regulon created using \code{epiregulon} package from reprogam-seq data
+regulon created using \code{epiregulon} package from reprogram-seq data
 }
 \examples{
 data(regulon)

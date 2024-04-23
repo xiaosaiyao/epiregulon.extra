@@ -16,11 +16,15 @@ test_that("plotActivityDim works correctly",{
   )
 })
 
+activity.matrix <- matrix(c(runif(100)*1.3, runif(100)),byrow=TRUE, nrow=2)
+rownames(activity.matrix) <- c("TF1", "TF2")
+activity.matrix[, 1:50] <- activity.matrix[, 1:50]*(runif(100)+0.8)
+
 test_that("plotActivityViolin works correctly",{
   expect_doppelganger(
     title = "Violin plot",
-    fig = plotActivityDim(sce = example_sce, activity = logcounts(example_sce),
-                          tf = c("Gene_0001","Gene_0002"),  label = "cluster")
+    fig = plotActivityViolin(activity.matrix, clusters = rep(c("a", "b"), each=50),
+                          tf = c("TF1","TF2"))
   )
 })
 

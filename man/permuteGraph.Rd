@@ -5,6 +5,8 @@
 \title{Calculate similarity score from permuted graphs to estimate background similarity}
 \usage{
 permuteGraph(graph, focal_tf, n = 100, p = 1)
+
+permuteGraph(graph, focal_tf, n = 100, p = 1)
 }
 \arguments{
 \item{graph}{an igraph object from \code{buildGraph} or \code{buildDiffGraph}}
@@ -19,8 +21,13 @@ calculate similarity score}
 \value{
 A matrix with Jaccard similarity between the focal transcription factor and all pairs of transcription factors
 for n permuted graphs
+
+A matrix with Jaccard similarity between the focal transcription factor and all pairs of transcription factors
+for n permuted graphs
 }
 \description{
+Calculate similarity score from permuted graphs to estimate background similarity
+
 Calculate similarity score from permuted graphs to estimate background similarity
 }
 \examples{

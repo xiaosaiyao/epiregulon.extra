@@ -1,4 +1,4 @@
-#' regulon created using `epiregulon` package from reprogam-seq data
+#' regulon created using `epiregulon` package from reprogram-seq data
 #' @name regulon
 #' @docType data
 #' @usage data(regulon)
