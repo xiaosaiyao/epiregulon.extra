@@ -133,8 +133,6 @@ are calculated from the original ones divided by
 
 \code{rankTfs} assign ranks to transcription factors according to degree
 centrality of their vertices
-
-\code{permuteGraph} permute an igraph object by rewiring the edges
 }
 \examples{
 # create an artificial getRegulon output
@@ -149,6 +147,7 @@ regulon$corr <- runif(5e3)*0.5+0.5
 regulon$weights <- matrix(runif(15000), nrow=5000, ncol=3)
 colnames(regulon$weights) <- c('all','cluster1', 'cluster2')
 graph_tripartite <- buildGraph(regulon, cluster='all', mode = 'tripartite')
+
 # build bipartite graph using regulatory element-target gene pairs
 graph_pairs_1 <- buildGraph(regulon, cluster = 'cluster1', mode = 'pairs')
 graph_pairs_2 <- buildGraph(regulon, cluster = 'cluster2', mode = 'pairs')
@@ -156,4 +155,5 @@ graph_diff <- buildDiffGraph(graph_pairs_1, graph_pairs_2)
 graph_diff <- addCentrality(graph_diff)
 graph_diff <- normalizeCentrality(graph_diff)
 tf_ranking <- rankTfs(graph_diff)
+
 }

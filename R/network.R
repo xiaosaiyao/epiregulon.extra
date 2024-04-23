@@ -51,8 +51,8 @@ plotGseaNetwork <- function(tf, enrichresults, ntop_pathways = 10, p.adj_cutoff 
 
     # create node object for igraph
     nodes.list <- lapply(names(pathway.list), function(x) {
-        data.frame(rbind(data.frame(name = x, type = tf_label), data.frame(name = pathway.list[[x]][,
-            gset_label], type = gset_label)))
+      data.frame(rbind(data.frame(name = x, type = tf_label), 
+                       data.frame(name = pathway.list[[x]][,gset_label], type = gset_label)))
     })
 
     nodes <- unique(do.call(rbind, nodes.list))
@@ -73,14 +73,14 @@ plotGseaNetwork <- function(tf, enrichresults, ntop_pathways = 10, p.adj_cutoff 
     l <- igraph::layout_with_sugiyama(p, attributes = "all", layers = igraph::V(p)$type.num)
 
     # plot
-    gseaplot <- ggraph::ggraph(l$extd_graph, layout = "sugiyama", layers = l$layout[,
-        2]) + ggraph::geom_edge_link(alpha = 0.8) + ggplot2::coord_flip() + ggplot2::scale_color_manual(values = pal) +
-        ggraph::theme_graph(base_family = "Helvetica", fg_text_colour = "black") +
-        ggraph::geom_node_point(aes_string(color = "type"), size = 5) + ggraph::geom_node_text(aes(label = name,
-        filter = type == gset_label), nudge_y = 0.1, hjust = 0) + ggraph::geom_node_text(aes(label = name,
-        filter = type == tf_label), nudge_y = -0.1, hjust = 1) + ggplot2::scale_y_continuous(expand = ggplot2::expansion(add = c(1,
-        4)))
-    print(gseaplot)
+    gseaplot <- ggraph::ggraph(l$extd_graph, layout = "sugiyama", layers = l$layout[,2]) + 
+      ggraph::geom_edge_link(alpha = 0.8) + ggplot2::coord_flip() + ggplot2::scale_color_manual(values = pal) +
+      ggraph::theme_graph(base_family = "Helvetica", fg_text_colour = "black") +
+      ggraph::geom_node_point(aes_string(color = "type"), size = 5) + 
+      ggraph::geom_node_text(aes(label = name, filter = type == gset_label), nudge_y = 0.1, hjust = 0) +
+      ggraph::geom_node_text(aes(label = name, filter = type == tf_label), nudge_y = -0.1, hjust = 1) + 
+      ggplot2::scale_y_continuous(expand = ggplot2::expansion(add = c(1,4)))
+    gseaplot
 
 }
 

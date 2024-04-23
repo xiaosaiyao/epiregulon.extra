@@ -15,3 +15,10 @@ A matrix with Jaccard similarity between all pairs of transcription factors.
 \description{
 Calculate Jaccard Similarity between regulons of all transcription factors
 }
+\examples{
+regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
+target = sample(letters[5:14], 100, replace = TRUE))
+regulon$weights <- runif(100)
+GRN_graph <- buildGraph(regulon)
+similarity <- calculateJaccardSimilarity(GRN_graph)
+}

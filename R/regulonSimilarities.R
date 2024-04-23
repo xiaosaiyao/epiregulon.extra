@@ -17,6 +17,7 @@
 findPartners <- function(graph, focal_tf) {
     checkmate::assert_character(focal_tf, len = 1)
     checkmate::assert_class(graph, "igraph")
+    
     if (length(unique(get.vertex.attribute(graph, name = "type"))) != 2)
         stop("Graph should contain vertices of two types. Input graph should not be created with the use of tripartite mode")
     focal_vertex <- V(graph)[V(graph)$name == focal_tf & V(graph)$type == "transcription factor"]
@@ -24,11 +25,14 @@ findPartners <- function(graph, focal_tf) {
         stop(sprintf("Focal transcription factor (%s) is not present in the input graph"),
             focal_tf)
     focal_tf_targets <- igraph::ego(graph, node = focal_vertex, mode = "out", mindist = 1)[[1]]
+    
     # keep other transcription factors
     redundant_vertices <- setdiff(as.numeric(V(graph)), as.numeric(V(graph)[V(graph)$type ==
         "transcription factor"]))
+    
     # keep focal tf's target genes
     redundant_vertices <- setdiff(redundant_vertices, as.numeric(focal_tf_targets))
+    
     # prune network removing target genes which do not belong to the focal tf's
     # regulon
     graph <- igraph::delete.vertices(graph, redundant_vertices)
@@ -40,6 +44,7 @@ findPartners <- function(graph, focal_tf) {
         focal_tf]
     all_tfs <- c(focal_vertex, other_tfs)  # focal tf first on the list
     focal_tf_targets <- V(graph)[V(graph)$type == "target gene"]
+    
     # create regulons using focal tf's target genes
     tf_targets_subgraphs <- lapply(all_tfs, function(tf, targets) igraph::subgraph(graph,
         vids = c(tf, intersection(targets, subcomponent(graph, tf, mode = "out")))),
@@ -76,13 +81,18 @@ findPartners <- function(graph, focal_tf) {
 #' @param graph a igraph object from `buildGraph` or `buildDiffGraph`
 #' @export
 #' @return A matrix with Jaccard similarity between all pairs of transcription factors.
+#' @examples
+#' regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
+#' target = sample(letters[5:14], 100, replace = TRUE))
+#' regulon$weights <- runif(100)
+#' GRN_graph <- buildGraph(regulon)
+#' similarity <- calculateJaccardSimilarity(GRN_graph)
 calculateJaccardSimilarity <- function(graph) {
     all_tfs <- V(graph)[V(graph)$type == "transcription factor"]
     res <- similarity(graph, vids = all_tfs, method = "jaccard", mode = "out")
     rownames(res) <- colnames(res) <- V(graph)[all_tfs]$name
     res
 }
-
 
 #' Calculate similarity score from permuted graphs to estimate background similarity
 #' @param graph an igraph object from `buildGraph` or `buildDiffGraph`
@@ -93,20 +103,26 @@ calculateJaccardSimilarity <- function(graph) {
 #' @return A matrix with Jaccard similarity between the focal transcription factor and all pairs of transcription factors
 #' for n permuted graphs
 #' @export
+#' @examples
+#' regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
+#' target = sample(letters[5:14], 100, replace = TRUE))
+#' regulon$weights <- runif(100)
+#' GRN_graph <- buildGraph(regulon)
+#' permuted_graph <- permuteGraph(GRN_graph, focal_tf = "a")
 permuteGraph <- function(graph, focal_tf, n = 100, p = 1) {
-    if (!focal_tf %in% names(V(graph)[V(graph)$type == "transcription factor"]))
-        stop(focal_tf, " vertex shoud be present in the graph")
-    all_tfs <- names(V(graph)[V(graph)$type == "transcription factor"])
-    permute_matrix <- matrix(rep(NA, length(all_tfs) * n),
-        nrow = length(all_tfs))
-    rownames(permute_matrix) <- all_tfs
-
-    for (iteration in seq_len(n)) {
-        diff_graph_permute <- rewire(graph, each_edge(prob = p))
-        similarity_score <- calculateJaccardSimilarity(diff_graph_permute)
-        permute_matrix[, iteration] <- similarity_score[focal_tf,
-            all_tfs]
-    }
-    permute_matrix
-
+  if (!focal_tf %in% names(V(graph)[V(graph)$type == "transcription factor"]))
+    stop(focal_tf, " vertex shoud be present in the graph")
+  all_tfs <- names(V(graph)[V(graph)$type == "transcription factor"])
+  permute_matrix <- matrix(rep(NA, length(all_tfs) * n),
+                           nrow = length(all_tfs))
+  rownames(permute_matrix) <- all_tfs
+  
+  for (iteration in seq_len(n)) {
+    diff_graph_permute <- rewire(graph, each_edge(prob = p))
+    similarity_score <- calculateJaccardSimilarity(diff_graph_permute)
+    permute_matrix[, iteration] <- similarity_score[focal_tf,
+                                                    all_tfs]
+  }
+  permute_matrix
+  
 }

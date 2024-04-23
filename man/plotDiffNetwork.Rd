@@ -52,5 +52,5 @@ plotDiffNetwork(regulon, tf = unique(tf_set)[1:3],
 clusters = c('C1', 'C2', 'C3'), cutoff = 0.2)
 }
 \author{
-Xiaodai Yao, Tomasz Wlodarczyk
+Xiaosai Yao, Tomasz Wlodarczyk
 }

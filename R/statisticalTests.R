@@ -171,7 +171,7 @@ regulonEnrich_ <- function(TF,
 
 #' Perform geneset enrichment of user-defined regulons
 #'
-#' @param TF  A character vector of TF names
+#' @param TF A character vector of TF names
 #' @param regulon A matrix of weighted regulon consisting of tf, targets, corr and weight
 #' @param weight String indicating the column name that should be used to filter target genes for geneset enrichment. Default is 'weight'.
 #' @param weight_cutoff A numeric scalar to indicate the cutoff to filter on the column specified by corr. Default is 0.5.

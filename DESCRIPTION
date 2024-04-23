@@ -1,6 +1,6 @@
 Package: epiregulon.extra
 Title: Companion package to epiregulon with additional plotting, differential and graph functions
-Version: 0.99.13
+Version: 0.99.14
 Authors@R: 
   c(person(given = "Xiaosai", family = "Yao", role = c("aut", "cre"), email = "xiaosai.yao@gmail.com", comment = c(ORCID = "0000-0001-9729-0726")),
     person(given = "Tomasz", family = "Włodarczyk", role = c("aut"), email = "tomwlo@gmail.com", comment = c(ORCID = "0000-0003-1554-9699")),
@@ -30,7 +30,7 @@ Imports:
     scater,
     stats
 Depends:
-    R (>= 2.10),
+    R (>= 4.4),
     SingleCellExperiment
 Suggests:
     epiregulon,
@@ -50,6 +50,6 @@ Suggests:
     ggrepel
 VignetteBuilder: knitr
 URL: https://github.com/xiaosaiyao/epiregulon.extra/
-biocViews: GeneExpression, Transcription, ChipOnChip, DifferentialExpression, GeneTarget, Normalization, GraphAndNetwork
+biocViews: GeneRegulation, Network, GeneExpression, Transcription, ChipOnChip, DifferentialExpression, GeneTarget, Normalization, GraphAndNetwork
 Config/testthat/edition: 3
 BugReports: https://github.com/xiaosaiyao/epiregulon.extra/issues
