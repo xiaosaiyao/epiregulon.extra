@@ -14,7 +14,7 @@
 #' regulon$weights <- runif(100)
 #' GRN_graph <- buildGraph(regulon)
 #' partners <- findPartners(GRN_graph, 'a')
-#' @importFrom igraph V E ego vertex_attr edge_attr delete_verrices subgraph shortest_paths similarity intersection subcomponent rewire each_edge
+#' @importFrom igraph V E ego vertex_attr edge_attr delete_vertices subgraph shortest_paths similarity intersection subcomponent rewire each_edge
 findPartners <- function(graph, focal_tf) {
   checkmate::assert_character(focal_tf, len = 1)
   checkmate::assert_class(graph, "igraph")
