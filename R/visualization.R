@@ -1,3 +1,4 @@
+#' @importFrom ggplot2 element_text scale_color_gradient
 plotActivityDim_ <- function(sce, activity_matrix, tf, dimtype,
     label, legend.label, colors, limit, ...) {
 
@@ -148,7 +149,6 @@ plotActivityViolin_ <- function(activity_matrix, tf, clusters,
 #'
 #' @return A combined ggplot object or a list of ggplots if `combine = FALSE`
 #' @export
-#' @import ggplot2
 #'
 #' @examples
 #' # create a mock singleCellExperiment object for gene expression matrix
@@ -295,7 +295,8 @@ plotBubble <- function(activity_matrix, tf, clusters,
     return(g)
 }
 
-#' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point coord_flip theme_bw ggtitle ylab theme
+#' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point 
+#' @importFrom ggplot2 coord_flip theme_bw ggtitle ylab theme unit element_blank
 
 enrichPlot_ <- function(results, title, top) {
     results$logP.adj <- -log10(results$p.adjust)
