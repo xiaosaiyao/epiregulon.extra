@@ -4,6 +4,7 @@
 # epiregulon.extra 0.99.5
 * Correct duplication error in `plotHeatmapRegulon`
 * default direction is changed to "any" in `getSigGenes`
+
 # epiregulon.extra 0.99.2
 
 # epiregulon.extra 0.99.3
