@@ -11,7 +11,9 @@
 #' @param tf_color String indicating the color of the tf label
 #' @param gset_color String indicating the color of the geneset label
 #' @return an igraph plot of interconnected pathways through TFs
-#' @importFrom igraph graph_from_data_frame layout_with_sugiyama V<- V
+#' @importFrom igraph graph_from_data_frame layout_with_sugiyama V<- V 
+#' @importFrom ggraph geom_edge_link theme_graph geom_node_point geom_node_text
+#' @importFrom ggplot2 coord_flip scale_color_manual scale_y_continuous expansion
 #' @export
 #' @examples
 #' AR <- data.frame(ID = c('ANDROGEN RESPONSE','PROLIFERATION','MAPK'),
@@ -73,13 +75,13 @@ plotGseaNetwork <- function(tf, enrichresults, ntop_pathways = 10, p.adj_cutoff 
   l <- layout_with_sugiyama(p, attributes = "all", layers = V(p)$type.num)
 
   # plot
-  gseaplot <- ggraph::ggraph(l$extd_graph, layout = "sugiyama", layers = l$layout[,2]) +
-    ggraph::geom_edge_link(alpha = 0.8) + ggplot2::coord_flip() + ggplot2::scale_color_manual(values = pal) +
-    ggraph::theme_graph(base_family = "Helvetica", fg_text_colour = "black") +
-    ggraph::geom_node_point(aes(color = type), size = 5) +
-    ggraph::geom_node_text(aes(label = name, filter = type == gset_label), nudge_y = 0.1, hjust = 0) +
-    ggraph::geom_node_text(aes(label = name, filter = type == tf_label), nudge_y = -0.1, hjust = 1) +
-    ggplot2::scale_y_continuous(expand = ggplot2::expansion(add = c(1,4)))
+  gseaplot <- ggraph(l$extd_graph, layout = "sugiyama", layers = l$layout[,2]) +
+    geom_edge_link(alpha = 0.8) + coord_flip() + scale_color_manual(values = pal) +
+    theme_graph(base_family = "Helvetica", fg_text_colour = "black") +
+    geom_node_point(aes(color = type), size = 5) +
+    geom_node_text(aes(label = name, filter = type == gset_label), nudge_y = 0.1, hjust = 0) +
+    geom_node_text(aes(label = name, filter = type == tf_label), nudge_y = -0.1, hjust = 1) +
+    scale_y_continuous(expand = expansion(add = c(1,4)))
   gseaplot
 
 }

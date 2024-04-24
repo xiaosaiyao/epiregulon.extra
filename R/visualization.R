@@ -92,7 +92,7 @@ plotActivityDim <- function(sce = NULL,
 }
 
 
-
+#' @importFrom ggplot2 ggplot geom_violin theme_classic ggtitle ylab theme scale_fill_manual facet_grid geom_boxplot
 plotActivityViolin_ <- function(activity_matrix, tf, clusters,
     legend.label, colors, text_size, facet_grid_variable,
     boxplot) {
@@ -106,7 +106,7 @@ plotActivityViolin_ <- function(activity_matrix, tf, clusters,
     }
 
 
-    g <- ggplot2::ggplot(df, aes(x = clusters,
+    g <- ggplot(df, aes(x = clusters,
         y = activity, fill = clusters)) + geom_violin() +
         theme_classic(base_size = 12) + ggtitle(tf) + ylab(legend.label) +
         theme(legend.position = "none", plot.title = element_text(hjust = 0.5),
@@ -210,7 +210,7 @@ plotActivityViolin <- function(activity_matrix, tf, clusters,
 #'
 #' @return A ggplot object
 #' @export
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot aes geom_point scale_color_viridis_c scale_size_continuous theme_classic theme labs ylab xlab ggtitle
 #'
 #' @examples
 #' example_sce <- scuttle::mockSCE()
@@ -271,7 +271,7 @@ plotBubble <- function(activity_matrix, tf, clusters,
         max.logpval <- max(logpval[is.finite(logpval)])
         logpval <- replace(logpval, is.infinite(logpval),
             max.logpval)
-        g <- ggplot2::ggplot(df.plot, aes(clusters,
+        g <- ggplot(df.plot, aes(clusters,
             tf, color = relative_activity)) +
             geom_point(stat = "identity", aes(size = logpval)) +
             scale_color_viridis_c(option = color.theme) +
@@ -282,7 +282,7 @@ plotBubble <- function(activity_matrix, tf, clusters,
             ylab(y.label) + xlab(x.label) + ylab(y.label) +
             xlab(x.label) + ggtitle(title)
     } else if (bubblesize == "summary.logFC") {
-        g <- ggplot2::ggplot(df.plot, aes(clusters,
+        g <- ggplot(df.plot, aes(clusters,
             tf, color = relative_activity)) +
             geom_point(stat = "identity", aes(size = summary.logFC)) +
             scale_color_viridis_c(option = color.theme) +
@@ -294,6 +294,8 @@ plotBubble <- function(activity_matrix, tf, clusters,
     }
     return(g)
 }
+
+#' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point coord_flip theme_bw ggtitle ylab theme
 
 enrichPlot_ <- function(results, title, top) {
     results$logP.adj <- -log10(results$p.adjust)
@@ -322,7 +324,6 @@ enrichPlot_ <- function(results, title, top) {
 #'
 #' @return A combined ggplot object or a list of ggplots if combine == FALSE
 #' @export
-#' @import ggplot2
 
 #' @examples
 #' #retrieve genesets
@@ -563,7 +564,7 @@ plotHeatmapActivity <- function(activity_matrix, sce, tfs, downsample = 1000,
 
 }
 
-#' @import ggplot2 ggbeeswarm
+#' @importFrom ggplot2 ggplot geom_boxplot geom_point aes ggtitle
 plotDiagnostic <- function(idx, regulon, expMatrix, exp_assay,
     exp_cutoff = 1, peakMatrix, peak_assay, peak_cutoff = 0,
     clusters) {
