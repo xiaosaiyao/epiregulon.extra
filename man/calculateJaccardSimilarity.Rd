@@ -5,20 +5,14 @@
 \title{Calculate Jaccard Similarity between regulons of all transcription factors}
 \usage{
 calculateJaccardSimilarity(graph)
-
-calculateJaccardSimilarity(graph)
 }
 \arguments{
 \item{graph}{a igraph object from \code{buildGraph} or \code{buildDiffGraph}}
 }
 \value{
 A matrix with Jaccard similarity between all pairs of transcription factors.
-
-A matrix with Jaccard similarity between all pairs of transcription factors.
 }
 \description{
-Calculate Jaccard Similarity between regulons of all transcription factors
-
 Calculate Jaccard Similarity between regulons of all transcription factors
 }
 \examples{

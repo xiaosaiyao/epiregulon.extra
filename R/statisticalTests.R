@@ -131,9 +131,7 @@ getSigGenes <- function(da_list,
 }
 
 
-regulonEnrich_ <- function(TF,
-    regulon, corr, corr_cutoff,
-    genesets) {
+regulonEnrich_ <- function(TF, regulon, corr, corr_cutoff, genesets) {
     message(TF)
     regulon.TF <- unique(regulon$target[which(regulon$tf ==
         TF & regulon[, corr] >

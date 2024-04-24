@@ -14,7 +14,7 @@
 #' regulon$weights <- runif(100)
 #' GRN_graph <- buildGraph(regulon)
 #' partners <- findPartners(GRN_graph, 'a')
-#' @importFrom igraph V E ego vertex_attr edge_attr delete_vertices subgraph shortest_paths similarity intersection subcomponent rewire each_edge
+#' @importFrom igraph V E ego vertex_attr edge_attr delete_vertices subgraph shortest_paths similarity intersection subcomponent rewire each_edge ends
 findPartners <- function(graph, focal_tf) {
   checkmate::assert_character(focal_tf, len = 1)
   checkmate::assert_class(graph, "igraph")
@@ -28,17 +28,18 @@ findPartners <- function(graph, focal_tf) {
   focal_tf_targets <- ego(graph, nodes = focal_vertex, mode = "out", mindist = 1)[[1]]
 
   # keep other transcription factors
-  redundant_vertices <- setdiff(as.numeric(V(graph)), as.numeric(V(graph)[V(graph)$type ==
-                                                                            "transcription factor"]))
+  redundant_vertices <- setdiff(as.numeric(V(graph)), 
+                                as.numeric(V(graph)[V(graph)$type == "transcription factor"]))
 
   # keep focal tf's target genes
   redundant_vertices <- setdiff(redundant_vertices, as.numeric(focal_tf_targets))
 
   # prune network removing target genes which do not belong to the focal tf's
   # regulon
-  graph <- igraph::delete_vertices(graph, redundant_vertices)
-  if (any(duplicated(igraph::ends(graph, es = E(graph)))))
+  graph <- delete_vertices(graph, redundant_vertices)
+  if (any(duplicated(ends(graph, es = E(graph)))))
     stop("Duplicated edges")
+  
   # find focal tf in the new graph
   focal_vertex <- V(graph)[V(graph)$name == focal_tf & V(graph)$type == "transcription factor"]
   other_tfs <- V(graph)[V(graph)$type == "transcription factor" & V(graph)$name !=
@@ -47,12 +48,12 @@ findPartners <- function(graph, focal_tf) {
   focal_tf_targets <- V(graph)[V(graph)$type == "target gene"]
 
   # create regulons using focal tf's target genes
-  tf_targets_subgraphs <- lapply(all_tfs, function(tf, targets) igraph::subgraph(graph,
-                                                                                 vids = c(tf, intersection(targets, subcomponent(graph, tf, mode = "out")))),
-                                 focal_tf_targets)
-  focal_weights <- igraph::edge_attr(tf_targets_subgraphs[[1]], index = E(tf_targets_subgraphs[[1]]),
-                                              name = "weight")
-  common_targets <- lapply(setdiff(seq_along(all_tfs), 1), get_common_targets, all_tfs, tf_targets_subgraphs, focal_weights, focal_tf_targets)
+  tf_targets_subgraphs <- lapply(all_tfs, function(tf, targets) 
+    subgraph(graph, vids = c(tf, intersection(targets, subcomponent(graph, tf, mode = "out")))),
+    focal_tf_targets)
+  focal_weights <- edge_attr(tf_targets_subgraphs[[1]], index = E(tf_targets_subgraphs[[1]]), name = "weight")
+  common_targets <- lapply(setdiff(seq_along(all_tfs), 1), 
+                           get_common_targets, all_tfs, tf_targets_subgraphs, focal_weights, focal_tf_targets)
   do.call(c, common_targets)
 }
 
@@ -80,8 +81,9 @@ get_common_targets <- function(idx, tfs, tf_targets_subgraphs, focal_weights, fo
 
 #' Calculate Jaccard Similarity between regulons of all transcription factors
 #' @param graph a igraph object from `buildGraph` or `buildDiffGraph`
-#' @export
+#' @importFrom igraph V similarity
 #' @return A matrix with Jaccard similarity between all pairs of transcription factors.
+#' @export
 #' @examples
 #' regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
 #' target = sample(letters[5:14], 100, replace = TRUE))
@@ -103,6 +105,7 @@ calculateJaccardSimilarity <- function(graph) {
 #' @param p a scalar indicating the probability of rewiring the graphs
 #' @return A matrix with Jaccard similarity between the focal transcription factor and all pairs of transcription factors
 #' for n permuted graphs
+#' @importFrom igraph V rewire
 #' @export
 #' @examples
 #' regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
@@ -128,42 +131,3 @@ permuteGraph <- function(graph, focal_tf, n = 100, p = 1) {
 }
 
 
-
-#' Calculate Jaccard Similarity between regulons of all transcription factors
-#' @param graph a igraph object from `buildGraph` or `buildDiffGraph`
-#' @export
-#' @return A matrix with Jaccard similarity between all pairs of transcription factors.
-calculateJaccardSimilarity <- function(graph) {
-    all_tfs <- V(graph)[V(graph)$type == "transcription factor"]
-    res <- similarity(graph, vids = all_tfs, method = "jaccard", mode = "out")
-    rownames(res) <- colnames(res) <- V(graph)[all_tfs]$name
-    res
-}
-
-
-#' Calculate similarity score from permuted graphs to estimate background similarity
-#' @param graph an igraph object from `buildGraph` or `buildDiffGraph`
-#' @param focal_tf character string indicating the name of the transcription factors to
-#' calculate similarity score
-#' @param n an integer indicating the number of permutations
-#' @param p a scalar indicating the probability of rewiring the graphs
-#' @return A matrix with Jaccard similarity between the focal transcription factor and all pairs of transcription factors
-#' for n permuted graphs
-#' @export
-permuteGraph <- function(graph, focal_tf, n = 100, p = 1) {
-    if (!focal_tf %in% names(V(graph)[V(graph)$type == "transcription factor"]))
-        stop(focal_tf, " vertex shoud be present in the graph")
-    all_tfs <- names(V(graph)[V(graph)$type == "transcription factor"])
-    permute_matrix <- matrix(rep(NA, length(all_tfs) * n),
-        nrow = length(all_tfs))
-    rownames(permute_matrix) <- all_tfs
-
-    for (iteration in seq_len(n)) {
-        diff_graph_permute <- rewire(graph, each_edge(prob = p))
-        similarity_score <- calculateJaccardSimilarity(diff_graph_permute)
-        permute_matrix[, iteration] <- similarity_score[focal_tf,
-            all_tfs]
-    }
-    permute_matrix
-
-}
