@@ -25,7 +25,7 @@ plotHeatmapActivity(
 )
 }
 \arguments{
-\item{activity_matrix}{A SingleCellExperiment object containing information of cell attributes}
+\item{activity_matrix}{A matrix of values, such as TF activities inferred from calculateActivity}
 
 \item{sce}{A SingleCellExperiment object containing information of cell attributes}
 

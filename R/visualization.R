@@ -286,7 +286,7 @@ plotBubble <- function(activity_matrix, tf, clusters,
             tf, color = relative_activity)) +
             geom_point(stat = "identity", aes(size = summary.logFC)) +
             scale_color_viridis_c(option = color.theme) +
-            scale_size_continuous("-logpval", range = c(0,
+            scale_size_continuous("summary logFC", range = c(0,
                 7)) + theme_classic(base_size = 12) +
             theme(axis.text.x = element_text(angle = 45,
                 hjust = 1)) + labs(color = legend.label) +
@@ -452,7 +452,7 @@ plotHeatmapRegulon <- function(sce,
     regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
 
     # remove duplicated genes from each tf
-    lapply(regulon.split, function(x) x[!duplicated(x$target), ])
+    regulon.split <- lapply(regulon.split, function(x) x[!duplicated(x$target), ])
 
     regulon <- do.call(rbind, as.list(regulon.split))
 
@@ -502,7 +502,7 @@ plotHeatmapRegulon <- function(sce,
 
 #' Plot transcription factor activity
 #'
-#' @param activity_matrix A SingleCellExperiment object containing information of cell attributes
+#' @param activity_matrix A matrix of values, such as TF activities inferred from calculateActivity
 #' @param sce A SingleCellExperiment object containing information of cell attributes
 #' @param tfs A character vector indicating the names of the transcription factors to be plotted
 #' @param downsample Integer indicating the number of cells to sample from the matrix
