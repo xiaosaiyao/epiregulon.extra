@@ -1,3 +1,8 @@
+# epiregulon.extra 1.0.1
+fixed documentation for `plotHeatmapActivity`
+fixed legend label of `summary.logFC` in `plotBubble` 
+removed duplicate genes from `plotHeatmapRegulon`
+
 # epiregulon.extra 0.99.16
 * Vignette updated
 
