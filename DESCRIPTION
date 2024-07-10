@@ -1,6 +1,6 @@
 Package: epiregulon.extra
 Title: Companion package to epiregulon with additional plotting, differential and graph functions
-Version: 1.0.1
+Version: 1.1.1
 Authors@R: 
   c(person(given = "Xiaosai", family = "Yao", role = c("aut", "cre"), email = "xiaosai.yao@gmail.com", comment = c(ORCID = "0000-0001-9729-0726")),
     person(given = "Tomasz", family = "Włodarczyk", role = c("aut"), email = "tomwlo@gmail.com", comment = c(ORCID = "0000-0003-1554-9699")),
