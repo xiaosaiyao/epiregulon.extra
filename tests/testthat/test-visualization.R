@@ -4,6 +4,7 @@ example_sce <- scuttle::mockSCE()
 example_sce <- scuttle::logNormCounts(example_sce)
 example_sce <- scater::runPCA(example_sce)
 example_sce <- scater::runUMAP(example_sce)
+set.seed(20913)
 example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 
 
