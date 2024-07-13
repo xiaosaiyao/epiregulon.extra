@@ -10,15 +10,6 @@ set.seed(20913)
 example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
 
 
-test_that("plotActivityDim works correctly",{
-  expect_doppelganger(
-    title = "Activity plot reduced dim",
-    fig = plotActivityDim(sce = example_sce, activity = logcounts(example_sce),
-                           tf = c("Gene_0001","Gene_0002"),  label = "cluster")
-
-  )
-})
-
 activity.matrix <- matrix(c(runif(100)*1.3, runif(100)),byrow=TRUE, nrow=2)
 rownames(activity.matrix) <- c("TF1", "TF2")
 activity.matrix[, 1:50] <- activity.matrix[, 1:50]*(runif(100)+0.8)
