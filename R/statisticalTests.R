@@ -50,7 +50,8 @@ findDifferentialActivity <- function(activity_matrix,
   direction <- match.arg(direction)
   activity_matrix <- stats::na.omit(as.matrix(activity_matrix))
   tf_markers <- scran::findMarkers(activity_matrix, clusters, test.type=test.type,
-                                   pval.type=pval.type, direction=direction, ...)
+                                   pval.type=pval.type, direction=direction,
+                                   sorted = FALSE, ...)
 
 
   if (!isTRUE(logvalues)){
