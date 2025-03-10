@@ -7,7 +7,7 @@
 getSigGenes(
   da_list,
   fdr_cutoff = 0.05,
-  logFC_cutoff = NULL,
+  summary_cutoff = NULL,
   topgenes = NULL,
   direction = c("any", "up", "down")
 )
@@ -17,7 +17,7 @@ getSigGenes(
 
 \item{fdr_cutoff}{A numeric scalar to specify the cutoff for FDR value. Default is 0.05}
 
-\item{logFC_cutoff}{A numeric scalar to specify the cutoff for log fold change.}
+\item{summary_cutoff}{A numeric scalar to specify the cutoff for log fold change or difference}
 
 \item{topgenes}{A integer scalar to indicate the number of top ordered genes to include in output}
 
@@ -37,7 +37,7 @@ colnames(score.combine) <- paste0("cell",1:200)
 cluster <- c(rep(1,100),rep(2,100))
 markers <- findDifferentialActivity(score.combine, cluster, pval.type = "some", direction = "up",
 test.type = "t")
-sig.genes <- getSigGenes(markers, fdr_cutoff = 1, logFC_cutoff = 0.1)
+sig.genes <- getSigGenes(markers, fdr_cutoff = 1, summary_cutoff = 0.1)
 utils::head(sig.genes)
 }
 \author{

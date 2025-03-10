@@ -8,7 +8,7 @@ plotBubble(
   activity_matrix,
   tf,
   clusters,
-  bubblesize = c("FDR", "summary.logFC"),
+  bubblesize = c("log.FDR", "summary.logFC", "summary.diff"),
   color.theme = "viridis",
   legend.label = "relative_activity",
   x.label = "clusters",
@@ -25,7 +25,7 @@ plotBubble(
 \item{clusters}{A character or integer vector of cluster or group labels for single cells}
 
 \item{bubblesize}{String indicating the variable from findDifferentialActivity output to scale size of bubbles
-by either \code{FDR} or \code{summary.logFC}. Default is \code{FDR}.}
+by either \code{log.FDR}, \code{summary.logFC} or \code{summary.diff}. Default is \code{logFDR}.}
 
 \item{color.theme}{String indicating the color theme used for the bubble plot and corresponding to the color options
 in \code{scale_color_viridis_c}}

@@ -13,7 +13,7 @@ regulonEnrich(TF, regulon, weight = "weight", weight_cutoff = 0.5, genesets)
 
 \item{weight}{String indicating the column name that should be used to filter target genes for geneset enrichment. Default is 'weight'.}
 
-\item{weight_cutoff}{A numeric scalar to indicate the cutoff to filter on the column specified by corr. Default is 0.5.}
+\item{weight_cutoff}{A numeric scalar to indicate the cutoff to filter on the column specified by \code{weight}. Default is 0.5.}
 
 \item{genesets}{A dataframe with the first column being the name of the geneset and the second column being the name of the genes}
 }

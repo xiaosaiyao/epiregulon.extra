@@ -199,7 +199,7 @@ plotActivityViolin <- function(activity_matrix, tf, clusters,
 #' @param tf A character vector indicating the names of the transcription factors to be plotted
 #' @param clusters A character or integer vector of cluster or group labels for single cells
 #' @param bubblesize String indicating the variable from findDifferentialActivity output to scale size of bubbles
-#' by either `FDR` or `summary.logFC`. Default is `FDR`.
+#' by either `log.FDR`, `summary.logFC` or `summary.diff`. Default is `logFDR`.
 #' @param color.theme String indicating the color theme used for the bubble plot and corresponding to the color options
 #' in `scale_color_viridis_c`
 #' @param legend.label String indicating the name of legend corresponding to the color scale
@@ -220,79 +220,87 @@ plotActivityViolin <- function(activity_matrix, tf, clusters,
 #' tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
 #' @author Shang-yang Chen
 plotBubble <- function(activity_matrix, tf, clusters,
-    bubblesize = c("FDR", "summary.logFC"), color.theme = "viridis",
-    legend.label = "relative_activity", x.label = "clusters",
-    y.label = "transcription factors", title = "TF activity",
-    ...) {
-
-    bubblesize <- match.arg(bubblesize)
-
-    # give warning for genes absent in tf list
-    missing <- tf[which(!tf %in% rownames(activity_matrix))]
-    if (!identical(missing, character(0))) {
-        message(missing, " not found in activity matrix. Excluded from plots")
-    }
-    tf <- tf[which(tf %in% rownames(activity_matrix))]
-
-    # find logFC and FDR of TFs
-    markers <- findDifferentialActivity(activity_matrix,
-        clusters, ...)
-    markers <- suppressMessages(getSigGenes(markers,
-        fdr_cutoff = 1.5, logFC_cutoff = -100))
-    markers <- markers[which(markers$tf %in% tf),
-        ]
-    levels <- make.names(unique(tf[tf %in% markers$tf]))
-    markers$tf <- make.names(markers$tf)
-    # rename markers
-    colnames(markers)[colnames(markers) == "class"] <- "clusters"
-
-
-    # z normalize activity and compute mean by cluster
-    tf.activity <- activity_matrix[tf, , drop = FALSE]
-    df <- data.frame(clusters = clusters, t(as.matrix(tf.activity)))
-    df.mean <- stats::aggregate(. ~ clusters, df,
-        mean)
-    zscores <- apply(df.mean[, -1], 2, scale)
-    df.mean <- data.frame(clusters = df.mean[, 1],
-        as.data.frame(zscores))
-    df.plot <- suppressMessages(reshape2::melt(df.mean,
-        id.variable = "clusters", variable.name = "tf",
-        value.name = "relative_activity"))
-
-    # merge logFC, FDR and mean activity
-    df.plot <- merge(df.plot, markers, by = c("tf",
-        "clusters"))
-    df.plot$tf <- factor(as.character(df.plot$tf),
-        levels = levels)
-
-    # generate bubble plots
-    if (bubblesize == "FDR") {
-        logpval <- -log10(df.plot$FDR)
-        max.logpval <- max(logpval[is.finite(logpval)])
-        logpval <- replace(logpval, is.infinite(logpval),
-            max.logpval)
-        g <- ggplot(df.plot, aes(clusters,
-            tf, color = relative_activity)) +
-            geom_point(stat = "identity", aes(size = logpval)) +
-            scale_color_viridis_c(option = color.theme) +
-            scale_size_continuous("-logpval", range = c(0,
-                7)) + theme_classic(base_size = 12) +
-            theme(axis.text.x = element_text(angle = 45,
-                hjust = 1)) + labs(color = legend.label) +
-            ylab(y.label) + xlab(x.label) + ylab(y.label) +
-            xlab(x.label) + ggtitle(title)
-    } else if (bubblesize == "summary.logFC") {
-        g <- ggplot(df.plot, aes(clusters,
-            tf, color = relative_activity)) +
-            geom_point(stat = "identity", aes(size = summary.logFC)) +
-            scale_color_viridis_c(option = color.theme) +
-            scale_size_continuous("summary logFC", range = c(0,
-                7)) + theme_classic(base_size = 12) +
-            theme(axis.text.x = element_text(angle = 45,
-                hjust = 1)) + labs(color = legend.label) +
-            ylab(y.label) + xlab(x.label) + ggtitle(title)
-    }
-    return(g)
+                       bubblesize = c("log.FDR", "summary.logFC","summary.diff"), 
+                       color.theme = "viridis",
+                       legend.label = "relative_activity", 
+                       x.label = "clusters",
+                       y.label = "transcription factors", 
+                       title = "TF activity",
+                       ...) {
+  
+  bubblesize <- match.arg(bubblesize)
+  
+  # give warning for genes absent in tf list
+  missing <- tf[which(!tf %in% rownames(activity_matrix))]
+  if (!identical(missing, character(0))) {
+    message(missing, " not found in activity matrix. Excluded from plots")
+  }
+  tf <- tf[which(tf %in% rownames(activity_matrix))]
+  
+  # find logFC and FDR of TFs
+  markers <- findDifferentialActivity(activity_matrix, clusters, log.p = TRUE, ...)
+  markers <- suppressMessages(getSigGenes(markers,
+                                          fdr_cutoff = 1.5, 
+                                          summary_cutoff = -100))
+  markers <- markers[which(markers$tf %in% tf),]
+  levels <- make.names(unique(tf[tf %in% markers$tf]))
+  markers$tf <- make.names(markers$tf)
+  
+  # rename markers
+  colnames(markers)[colnames(markers) == "class"] <- "clusters"
+  
+  # z normalize activity and compute mean by cluster
+  tf.activity <- activity_matrix[tf, , drop = FALSE]
+  df <- data.frame(clusters = clusters, t(as.matrix(tf.activity)))
+  df.mean <- stats::aggregate(. ~ clusters, df, mean)
+  zscores <- apply(df.mean[, -1], 2, scale)
+  df.mean <- data.frame(clusters = df.mean[, 1],
+                        as.data.frame(zscores))
+  df.plot <- suppressMessages(reshape2::melt(df.mean,
+                                             id.variable = "clusters", 
+                                             variable.name = "tf",
+                                             value.name = "relative_activity"))
+  
+  # merge logFC, FDR and mean activity
+  df.plot <- merge(df.plot, markers, by = c("tf","clusters"))
+  df.plot$tf <- factor(as.character(df.plot$tf), levels = levels)
+  
+  # generate bubble plots
+  if (bubblesize == "log.FDR") {
+    g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
+      geom_point(stat = "identity", aes(size = -log.FDR)) +
+      scale_color_viridis_c(option = color.theme) +
+      scale_size_continuous("-log.FDR", range = c(0, 7)) + 
+      theme_classic(base_size = 12) +
+      theme(axis.text.x = element_text(angle = 45,
+                                       hjust = 1)) + 
+      labs(color = legend.label) +
+      ylab(y.label) + xlab(x.label) + ylab(y.label) +
+      xlab(x.label) + ggtitle(title)
+    
+  } else if (bubblesize == "summary.logFC") {
+    g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
+      geom_point(stat = "identity", aes(size = summary.logFC)) +
+      scale_color_viridis_c(option = color.theme) +
+      scale_size_continuous("summary logFC", range = c(0,7)) + 
+      theme_classic(base_size = 12) +
+      theme(axis.text.x = element_text(angle = 45,
+                                       hjust = 1)) + 
+      labs(color = legend.label) +
+      ylab(y.label) + xlab(x.label) + ggtitle(title)
+    
+  } else if (bubblesize == "summary.diff") {
+    g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
+      geom_point(stat = "identity", aes(size = summary.diff)) +
+      scale_color_viridis_c(option = color.theme) +
+      scale_size_continuous("summary diff", range = c(0,7)) + 
+      theme_classic(base_size = 12) +
+      theme(axis.text.x = element_text(angle = 45,
+                                       hjust = 1)) + 
+      labs(color = legend.label) +
+      ylab(y.label) + xlab(x.label) + ggtitle(title)
+  }
+  return(g)
 }
 
 #' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point 
@@ -399,6 +407,7 @@ enrichPlot <- function(results, top = 15, ncol = 3, title = NULL,
 #' See [here](https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annotations.html#simple-annotation)
 #' @param row_col A list specifying the colors in the rows.
 #' See [here](https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annotations.html#simple-annotation)
+#' @param genes_label A character vector indicating a selected list of genes to show on the rownames
 #' @param ... other arguments for `ComplexHeatmap::Heatmap`
 #' @return A Heatmap-class object.
 #' @export
@@ -413,91 +422,118 @@ enrichPlot <- function(results, top = 15, ncol = 3, title = NULL,
 #' cell_attributes='cluster', col_gap = 'cluster', column_title_rot = 90)
 #' @author Xiaosai Yao
 
+
+
 plotHeatmapRegulon <- function(sce,
-    tfs, regulon, regulon_column = "weight",
-    regulon_cutoff = 0.1,
-    downsample = 1000,
-    scale = TRUE,
-    center = TRUE,
-    color_breaks = c(-2,
-        0, 2),
-    colors = c("blue","white", "red"),
-    cell_attributes, col_gap = NULL,
-    exprs_values = "logcounts",
-    use_raster = TRUE,
-    raster_quality = 10,
-    cluster_rows = FALSE,
-    cluster_columns = FALSE,
-    border = TRUE, show_column_names = FALSE,
-    column_col = NULL,
-    row_col = NULL, ...) {
-
-    downsample_seq <- seq(from = 1,
-        to = ncol(sce),
-        by = floor(max(1,
-            ncol(sce)/downsample)))
-
-    # keep only targets belonging to TFs and meeting cutoff
-    if (is.matrix(regulon[[regulon_column]])) {
-
-        regulon <- regulon[which(regulon$tf %in% tfs &
-                             apply(regulon[[regulon_column]], 1,
-                                   function(x) any(x > regulon_cutoff))), ]
-
-    } else {
-        regulon <- regulon[regulon$tf %in% tfs &
-                             regulon[,regulon_column] > regulon_cutoff, ,drop=FALSE]
-    }
-
-    regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
-
-    # remove duplicated genes from each tf
-    regulon.split <- lapply(regulon.split, function(x) x[!duplicated(x$target), ])
-
-    regulon <- do.call(rbind, as.list(regulon.split))
-
-    # remove targets not found in sce
-    regulon <- regulon[regulon$target %in% rownames(sce),]
-    targets <- regulon$target
-
-    sce <- sce[targets, downsample_seq]
-
-
-    right_annotation <- data.frame(tf = regulon$tf)
-    top_annotation <- data.frame(colData(sce)[cell_attributes])
-
-    if (!is.null(col_gap)) {
-        column_split <- top_annotation[col_gap]
-    } else {
-        column_split <- NULL
-    }
-
-
-
-    mat <- as.matrix(SummarizedExperiment::assay(sce,
-        exprs_values))
-    mat <- t(scale(t(mat),
-        scale = scale,
-        center = center))
-
-    col_fun <- circlize::colorRamp2(color_breaks,
-        colors)
-
+                               tfs, regulon, regulon_column = "weight",
+                               regulon_cutoff = 0.1,
+                               downsample = 1000,
+                               scale = TRUE,
+                               center = TRUE,
+                               color_breaks = c(-2,
+                                                0, 2),
+                               colors = c("blue","white", "red"),
+                               cell_attributes, col_gap = NULL,
+                               exprs_values = "logcounts",
+                               use_raster = TRUE,
+                               raster_quality = 10,
+                               cluster_rows = FALSE,
+                               cluster_columns = FALSE,
+                               border = TRUE, show_column_names = FALSE,
+                               column_col = NULL,
+                               row_col = NULL,
+                               genes_label = NULL,...) {
+  
+  downsample_seq <- seq(from = 1,
+                        to = ncol(sce),
+                        by = floor(max(1,
+                                       ncol(sce)/downsample)))
+  
+  # keep only targets belonging to TFs and meeting cutoff
+  if (is.matrix(regulon[[regulon_column]])) {
+    
+    regulon <- regulon[which(regulon$tf %in% tfs &
+                               apply(regulon[[regulon_column]], 1,
+                                     function(x) any(x > regulon_cutoff))), ]
+    
+  } else {
+    regulon <- regulon[regulon$tf %in% tfs &
+                         regulon[,regulon_column] > regulon_cutoff, ,drop=FALSE]
+  }
+  
+  regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
+  
+  # remove duplicated genes from each tf
+  regulon.split <- lapply(regulon.split, function(x) x[!duplicated(x$target), ])
+  
+  regulon <- do.call(rbind, as.list(regulon.split))
+  
+  # remove targets not found in sce
+  regulon <- regulon[regulon$target %in% rownames(sce),]
+  targets <- regulon$target
+  
+  sce <- sce[targets, downsample_seq]
+  
+  
+  right_annotation <- data.frame(tf = regulon$tf)
+  top_annotation <- data.frame(colData(sce)[cell_attributes])
+  
+  if (!is.null(col_gap)) {
+    column_split <- top_annotation[col_gap]
+  } else {
+    column_split <- NULL
+  }
+  
+  
+  
+  mat <- as.matrix(SummarizedExperiment::assay(sce,
+                                               exprs_values))
+  mat <- t(scale(t(mat),
+                 scale = scale,
+                 center = center))
+  
+  col_fun <- circlize::colorRamp2(color_breaks,
+                                  colors)
+  if (!is.null(genes_label)){
+    
+    indexmatch <- match(genes_label, rownames(mat))
+    
     ComplexHeatmap::Heatmap(mat,
-        col = col_fun,
-        top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation,
-            col = column_col),
-        right_annotation = ComplexHeatmap::rowAnnotation(df = right_annotation,
-            col = row_col),
-        row_split = right_annotation,
-        column_split = column_split,
-        use_raster = use_raster,
-        raster_quality = raster_quality,
-        cluster_rows = cluster_rows,
-        cluster_columns = cluster_columns,
-        border = border,
-        show_column_names = show_column_names,
-        ...)
+                            col = col_fun,
+                            top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation,
+                                                                               col = column_col),
+                            right_annotation = ComplexHeatmap::rowAnnotation(df = right_annotation,
+                                                                             col = row_col,
+                                                                             foo = ComplexHeatmap::anno_mark(at = stats::na.omit(indexmatch),
+                                                                                                             labels = rownames(mat)[stats::na.omit(indexmatch)])),
+                            row_split = right_annotation,
+                            column_split = column_split,
+                            use_raster = use_raster,
+                            raster_quality = raster_quality,
+                            cluster_rows = cluster_rows,
+                            cluster_columns = cluster_columns,
+                            border = border,
+                            show_column_names = show_column_names,
+                            ...)
+    
+  } else {
+    ComplexHeatmap::Heatmap(mat,
+                            col = col_fun,
+                            top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation,
+                                                                               col = column_col),
+                            right_annotation = ComplexHeatmap::rowAnnotation(df = right_annotation,
+                                                                             col = row_col),
+                            row_split = right_annotation,
+                            column_split = column_split,
+                            use_raster = use_raster,
+                            raster_quality = raster_quality,
+                            cluster_rows = cluster_rows,
+                            cluster_columns = cluster_columns,
+                            border = border,
+                            show_column_names = show_column_names,
+                            ...)
+  }
+  
 }
 
 #' Plot transcription factor activity

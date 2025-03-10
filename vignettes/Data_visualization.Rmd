@@ -87,7 +87,8 @@ markers <- findDifferentialActivity(
   clusters = GeneExpressionMatrix$hash_assignment,
   pval.type = "some",
   direction = "up",
-  test.type = "t"
+  test.type = "t",
+  logvalue = FALSE
 )
 ```
 
