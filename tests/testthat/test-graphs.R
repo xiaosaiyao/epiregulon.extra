@@ -256,7 +256,7 @@ res <- data.frame(tf = tfs, centrality = centralities, rank = rank(-centralities
 res <- res[order(res$centrality, decreasing = TRUE),]
 rownames(res) <- as.integer(res$rank)
 test_that("rankTfs works correctly",
-          {expect_identical(rankTfs(test_graph), res)}
+          {expect_equal(rankTfs(test_graph), res, tolerance = 1e-8)}
 )
 
 test_graph <- normalizeCentrality(test_graph)

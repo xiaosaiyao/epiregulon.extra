@@ -7,7 +7,6 @@
 getSigGenes(
   da_list,
   fdr_cutoff = 0.05,
-  logFC_cutoff = deprecated(),
   summary_cutoff = NULL,
   topgenes = NULL,
   direction = c("any", "up", "down")
@@ -17,8 +16,6 @@ getSigGenes(
 \item{da_list}{List of dataframes from running findDifferentialActivity}
 
 \item{fdr_cutoff}{A numeric scalar to specify the cutoff for FDR value. Default is 0.05}
-
-\item{logFC_cutoff}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} A numeric scalar to specify the cutoff for log fold change}
 
 \item{summary_cutoff}{A numeric scalar to specify the cutoff for log fold change or difference}
 

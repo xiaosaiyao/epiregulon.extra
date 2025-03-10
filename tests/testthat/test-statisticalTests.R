@@ -88,3 +88,30 @@ test_that("regulonEnrich works correctly", {
   expect_equal(regulonEnrich(LETTERS[1:2], regulon, weight = "weight", weight_cutoff = 0.25,
                              genesets), res)
 })
+
+
+set.seed(100)
+n_cells = 2000
+n_tfs <- 100
+n_clusters <- 5
+clusters <- sample(letters[1:n_clusters], 2000, replace = TRUE)
+unique_clusters <- unique(clusters)
+tf_names <- paste0("TF_", 1:n_tfs)
+tf_names <- sample(tf_names) # random order
+tf_to_cluster_matrix <- matrix(1, nrow=n_tfs, ncol=n_cells)
+for(i in seq_len(n_tfs)){
+  tf_to_cluster_matrix[i,which(clusters==sample(unique_clusters,1))] <- 2
+}
+activity_matrix <- matrix(nrow=n_tfs, ncol=n_cells)
+activity_matrix[1:length(activity_matrix)] <- rnorm(length(activity_matrix), as.numeric(tf_to_cluster_matrix), 1)
+
+colnames(activity_matrix) <- paste0("cell_", 1:n_cells)
+rownames(activity_matrix) <- tf_names
+tf_markers <- scran::findMarkers(activity_matrix, clusters, test.type="t",
+                                 pval.type="some", direction="up", sorted=FALSE)
+
+test_that("findDifferentialActivity preserves the gene order", {
+  expect_equal(rownames(findDifferentialActivity(activity_matrix, clusters, test.type="t")[[1]]), tf_names)
+  expect_equal(rownames(findDifferentialActivity(activity_matrix, clusters, test.type="binom")[[1]]), tf_names)
+  expect_equal(rownames(findDifferentialActivity(activity_matrix, clusters, test.type="wilcox")[[1]]), tf_names)
+})

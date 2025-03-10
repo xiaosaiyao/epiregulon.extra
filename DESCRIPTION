@@ -22,12 +22,10 @@ Imports:
     ggplot2,
     ggraph,
     igraph,
-    lifecycle,
     patchwork,
     reshape2,
     scales,
-    scater,
-    stats
+    scater
 Depends:
     R (>= 4.4),
     SingleCellExperiment

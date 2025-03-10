@@ -7,10 +7,9 @@
 findDifferentialActivity(
   activity_matrix,
   clusters,
-  test.type = "t",
-  pval.type = "some",
+  test.type = c("t", "wilcox", "binom"),
+  pval.type = c("some", "any", "all"),
   direction = c("any", "up", "down"),
-  groups = deprecated(),
   logvalues = TRUE,
   ...
 )
@@ -22,11 +21,9 @@ findDifferentialActivity(
 
 \item{test.type}{String indicating the type of statistical tests to be passed to scran::findMarkers, can be "t", "wilcox". or "binom"}
 
-\item{pval.type}{A string specifying how p-values are to be combined across pairwise comparisons for a given group/cluster.}
+\item{pval.type}{A string specifying how p-values are to be combined across pairwise comparisons for a given group/cluster. For more details see \link[scran]{combineMarkers}.}
 
 \item{direction}{A string specifying direction of differential TF activity, can be "any", "up" or "down"}
-
-\item{groups}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} A character or integer vector of cluster or group labels for single cells}
 
 \item{logvalues}{logical indicating whether activities are computed from logged gene expression or not.
 If activity is computed from linear values of gene expression, setting logvalues to FALSE will return the difference.
