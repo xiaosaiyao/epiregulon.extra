@@ -220,35 +220,35 @@ plotActivityViolin <- function(activity_matrix, tf, clusters,
 #' tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
 #' @author Shang-yang Chen
 plotBubble <- function(activity_matrix, tf, clusters,
-                       bubblesize = c("log.FDR", "summary.logFC","summary.diff"), 
+                       bubblesize = c("log.FDR", "summary.logFC","summary.diff"),
                        color.theme = "viridis",
-                       legend.label = "relative_activity", 
+                       legend.label = "relative_activity",
                        x.label = "clusters",
-                       y.label = "transcription factors", 
+                       y.label = "transcription factors",
                        title = "TF activity",
                        ...) {
-  
+
   bubblesize <- match.arg(bubblesize)
-  
+
   # give warning for genes absent in tf list
   missing <- tf[which(!tf %in% rownames(activity_matrix))]
   if (!identical(missing, character(0))) {
     message(missing, " not found in activity matrix. Excluded from plots")
   }
   tf <- tf[which(tf %in% rownames(activity_matrix))]
-  
+
   # find logFC and FDR of TFs
   markers <- findDifferentialActivity(activity_matrix, clusters, log.p = TRUE, ...)
   markers <- suppressMessages(getSigGenes(markers,
-                                          fdr_cutoff = 1.5, 
+                                          fdr_cutoff = 1.5,
                                           summary_cutoff = -100))
   markers <- markers[which(markers$tf %in% tf),]
   levels <- make.names(unique(tf[tf %in% markers$tf]))
   markers$tf <- make.names(markers$tf)
-  
+
   # rename markers
   colnames(markers)[colnames(markers) == "class"] <- "clusters"
-  
+
   # z normalize activity and compute mean by cluster
   tf.activity <- activity_matrix[tf, , drop = FALSE]
   df <- data.frame(clusters = clusters, t(as.matrix(tf.activity)))
@@ -257,53 +257,53 @@ plotBubble <- function(activity_matrix, tf, clusters,
   df.mean <- data.frame(clusters = df.mean[, 1],
                         as.data.frame(zscores))
   df.plot <- suppressMessages(reshape2::melt(df.mean,
-                                             id.variable = "clusters", 
+                                             id.variable = "clusters",
                                              variable.name = "tf",
                                              value.name = "relative_activity"))
-  
+
   # merge logFC, FDR and mean activity
   df.plot <- merge(df.plot, markers, by = c("tf","clusters"))
   df.plot$tf <- factor(as.character(df.plot$tf), levels = levels)
-  
+
   # generate bubble plots
   if (bubblesize == "log.FDR") {
     g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
       geom_point(stat = "identity", aes(size = -log.FDR)) +
       scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous("-log.FDR", range = c(0, 7)) + 
+      scale_size_continuous("-log.FDR", range = c(0, 7)) +
       theme_classic(base_size = 12) +
       theme(axis.text.x = element_text(angle = 45,
-                                       hjust = 1)) + 
+                                       hjust = 1)) +
       labs(color = legend.label) +
       ylab(y.label) + xlab(x.label) + ylab(y.label) +
       xlab(x.label) + ggtitle(title)
-    
+
   } else if (bubblesize == "summary.logFC") {
     g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
       geom_point(stat = "identity", aes(size = summary.logFC)) +
       scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous("summary logFC", range = c(0,7)) + 
+      scale_size_continuous("summary logFC", range = c(0,7)) +
       theme_classic(base_size = 12) +
       theme(axis.text.x = element_text(angle = 45,
-                                       hjust = 1)) + 
+                                       hjust = 1)) +
       labs(color = legend.label) +
       ylab(y.label) + xlab(x.label) + ggtitle(title)
-    
+
   } else if (bubblesize == "summary.diff") {
     g <- ggplot(df.plot, aes(clusters, tf, color = relative_activity)) +
       geom_point(stat = "identity", aes(size = summary.diff)) +
       scale_color_viridis_c(option = color.theme) +
-      scale_size_continuous("summary diff", range = c(0,7)) + 
+      scale_size_continuous("summary diff", range = c(0,7)) +
       theme_classic(base_size = 12) +
       theme(axis.text.x = element_text(angle = 45,
-                                       hjust = 1)) + 
+                                       hjust = 1)) +
       labs(color = legend.label) +
       ylab(y.label) + xlab(x.label) + ggtitle(title)
   }
   return(g)
 }
 
-#' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point 
+#' @importFrom ggplot2 ggplot aes scale_colour_gradient geom_point
 #' @importFrom ggplot2 coord_flip theme_bw ggtitle ylab theme unit element_blank
 
 enrichPlot_ <- function(results, title, top) {
@@ -336,15 +336,12 @@ enrichPlot_ <- function(results, title, top) {
 
 #' @examples
 #' #retrieve genesets
-#' H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-#' cat = 'H', gene.id.type = 'SYMBOL' )
-#' C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-#' cat = 'C6', gene.id.type = 'SYMBOL' )
+#' msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
 #'
-#' #combine genesets and convert genesets to be compatible with enricher
-#' gs <- c(H,C6)
-#' gs.list <- do.call(rbind,lapply(names(gs), function(x) {
-#' data.frame(gs=x, genes=gs[[x]])}))
+#' #convert genesets to be compatible with enricher
+#' msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) %in% c("c6", "h")}))]
+#' gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
+#'  data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))}))
 #'
 #' head(gs.list)
 #'
@@ -443,61 +440,61 @@ plotHeatmapRegulon <- function(sce,
                                column_col = NULL,
                                row_col = NULL,
                                genes_label = NULL,...) {
-  
+
   downsample_seq <- seq(from = 1,
                         to = ncol(sce),
                         by = floor(max(1,
                                        ncol(sce)/downsample)))
-  
+
   # keep only targets belonging to TFs and meeting cutoff
   if (is.matrix(regulon[[regulon_column]])) {
-    
+
     regulon <- regulon[which(regulon$tf %in% tfs &
                                apply(regulon[[regulon_column]], 1,
                                      function(x) any(x > regulon_cutoff))), ]
-    
+
   } else {
     regulon <- regulon[regulon$tf %in% tfs &
                          regulon[,regulon_column] > regulon_cutoff, ,drop=FALSE]
   }
-  
+
   regulon.split <- S4Vectors::split(regulon, f <- regulon$tf)
-  
+
   # remove duplicated genes from each tf
   regulon.split <- lapply(regulon.split, function(x) x[!duplicated(x$target), ])
-  
+
   regulon <- do.call(rbind, as.list(regulon.split))
-  
+
   # remove targets not found in sce
   regulon <- regulon[regulon$target %in% rownames(sce),]
   targets <- regulon$target
-  
+
   sce <- sce[targets, downsample_seq]
-  
-  
+
+
   right_annotation <- data.frame(tf = regulon$tf)
   top_annotation <- data.frame(colData(sce)[cell_attributes])
-  
+
   if (!is.null(col_gap)) {
     column_split <- top_annotation[col_gap]
   } else {
     column_split <- NULL
   }
-  
-  
-  
+
+
+
   mat <- as.matrix(SummarizedExperiment::assay(sce,
                                                exprs_values))
   mat <- t(scale(t(mat),
                  scale = scale,
                  center = center))
-  
+
   col_fun <- circlize::colorRamp2(color_breaks,
                                   colors)
   if (!is.null(genes_label)){
-    
+
     indexmatch <- match(genes_label, rownames(mat))
-    
+
     ComplexHeatmap::Heatmap(mat,
                             col = col_fun,
                             top_annotation = ComplexHeatmap::HeatmapAnnotation(df = top_annotation,
@@ -515,7 +512,7 @@ plotHeatmapRegulon <- function(sce,
                             border = border,
                             show_column_names = show_column_names,
                             ...)
-    
+
   } else {
     ComplexHeatmap::Heatmap(mat,
                             col = col_fun,
@@ -533,7 +530,7 @@ plotHeatmapRegulon <- function(sce,
                             show_column_names = show_column_names,
                             ...)
   }
-  
+
 }
 
 #' Plot transcription factor activity
