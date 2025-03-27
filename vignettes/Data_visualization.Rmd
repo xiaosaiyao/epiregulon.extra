@@ -227,7 +227,8 @@ enrichPlot(results = enrichresults)
 # Network analysis
 
 We can visualize the genesets as a network
-```{r plot gsea network, eval = FALSE}
+
+```{r plot gsea network,  eval = !(Sys.info()["sysname"] == "Darwin")}
 plotGseaNetwork(
   tf = names(enrichresults),
   enrichresults = enrichresults,
@@ -240,7 +241,9 @@ plotGseaNetwork(
 
 We are interested in understanding the differential networks between two conditions and determining which transcription factors account for the differences in the topology of networks. The pruned regulons with cluster-specific test statistics computed by `pruneRegulon` can be used to generate cluster-specific networks based on user-defined cutoffs and to visualize differential networks for transcription factors of interest. In this dataset, the GATA6 gene was only expressed in cluster 1 (C1) and NKX2-1 was only expressed in cluster 3 (C3). If we visualize the target genes of GATA6, we can see that C1 has many more target genes of GATA6 compared to C5, a cluster that does not express GATA6. Similarly, NKX2-1 target genes are confined to C3 which is the only cluster that exogenously expresses NKX2-1.
 
-```{r differential networks , eval = FALSE}
+
+```{r differential networks, eval = !(Sys.info()["sysname"] == "Darwin")}
+
 plotDiffNetwork(regulon,
   cutoff = 0.1,
   tf = c("GATA6"),
@@ -259,7 +262,8 @@ plotDiffNetwork(regulon,
 ```
 
 We can also visualize how transcription factors relate to other transcription factors in C1 cluster.
-```{r , eval = FALSE}
+```{r, eval = !(Sys.info()["sysname"] == "Darwin") }
+
 selected <- which(regulon$weight[, "C1"] > 0 &
   regulon$tf %in% c("GATA6", "FOXA1", "AR"))
 
