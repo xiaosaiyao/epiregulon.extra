@@ -123,10 +123,10 @@ buildGraph <- function(regulon,
                        na_replace = TRUE,
                        keep_original_names = TRUE,
                        filter_edges = NULL) {
-  
+
   if (!is.null(weights) && !weights %in%
       colnames(regulon))
-    stop(sprintf("%s column should be present in the regulon",
+    stop(sprintf("%s column should be present in the regulon or `weights` argument must be set to NULL",
                  weights))
   mode <- match.arg(mode)
   # give names to the peaks and target genes which will be easy to extract
@@ -139,9 +139,9 @@ buildGraph <- function(regulon,
                            pairs = c("tf", "idxATAC","target"),
                            tripartite = c("idxATAC","target"),
                            tg = c("tf","target"))
-  
+
   graph_data <- regulon[, vertex_columns]
-  
+
   if (!is.null(weights)) {
     if (is.matrix(regulon[,weights])) {
       stopifnot(cluster %in% colnames(regulon[,weights]))
@@ -170,7 +170,7 @@ buildGraph <- function(regulon,
     rm(graph_data_tf_re)
     vertex_columns <- c("from", "to")
   }
-  
+
   if (mode == "pairs") {
     # create node names corresponding to re-tg pairs
     graph_data$target <- paste(graph_data$idxATAC,
@@ -178,7 +178,7 @@ buildGraph <- function(regulon,
     graph_data <- graph_data[,c("tf", "target", weights)]
     vertex_columns <- c("tf","target")
   }
-  
+
   if (is.null(weights)) {
     # avoid duplicated edges in the case of unweighted graph
     graph_data <- unique(graph_data)
@@ -188,7 +188,7 @@ buildGraph <- function(regulon,
     graph_data <- aggregate_edges(graph_data,
                                   aggregation_function)
   }
-  
+
   epiregulon_graph <- graph_from_data_frame(graph_data)
   if (mode == "tripartite") {
     layer_numb <- rep(1, vcount(epiregulon_graph))
@@ -211,7 +211,7 @@ buildGraph <- function(regulon,
   V(epiregulon_graph)$type.num <- match(V(epiregulon_graph)$type,
                                         c("transcription factor",
                                           "peak", "target gene"))
-  
+
   # restore original names
   if (keep_original_names) {
     V(epiregulon_graph)$name <- gsub("_target_gene$|_peak$",
@@ -247,13 +247,13 @@ buildDiffGraph <- function(graph_obj_1, graph_obj_2, weighted = TRUE, abs_diff =
     res <- graph_from_adjacency_matrix(abs(as_adjacency_matrix(graph_obj_1) - as_adjacency_matrix(graph_obj_2)),
                                        weighted = FALSE)
   }
-  
+
   if (!identical(V(graph_obj_1)$type, V(graph_obj_2)$type)) {
     warning("Types of nodes differ between graphs. Only those from the first graph are used.")
   }
   V(res)$type <- V(graph_obj_1)$type
   V(res)$type.num <- V(graph_obj_1)$type.num
-  
+
   # remove nodes with no edges
   edge_numbers <- vapply(incident_edges(res, V(res), mode = "all"), length, FUN.VALUE = numeric(1))
   res <- delete_vertices(res, V(res)[edge_numbers == 0])
@@ -276,11 +276,11 @@ normalizeCentrality <- function(graph, FUN = sqrt, weighted = TRUE) {
     stop("Vertices do not have 'centrality' attribute")
   if (!"weight" %in% list.edge.attributes(graph) & weighted)
     stop("Set 'weight' attribute to edges or use with 'weighted = FALSE'")
-  
+
   # calculate number of edges for each node
   edge_numbers <- vapply(incident_edges(graph, V(graph), mode = "all"),
                          length, FUN.VALUE = numeric(1))
-  
+
   V(graph)$centrality <- V(graph)$centrality/FUN(edge_numbers)
   graph
 }
@@ -370,7 +370,7 @@ plotEpiregulonNetwork <- function(graph,
                     shape = 21, data = highlighted,
                     size = 3, stroke = point_border_size) +
     theme_void() + labs(fill = NULL)
-  
+
   return(my_plot)
 }
 
@@ -413,20 +413,20 @@ plotDiffNetwork <- function(regulon, cutoff = 0.01, tf = NULL,
     # apply cutoff
     idx <- which(regulon$tf %in% tf & regulon[, weight][,cluster] > cutoff)
     regulon_cluster <- regulon[idx, c("tf", "target", weight)]
-    
+
     # rename colnames as weight to be consistent across all groups
     regulon_cluster$weight <- regulon_cluster[, weight][,cluster]
-    
+
     # rename tf to be tf_cluster
     regulon_cluster[, "tf"] <- paste0(regulon_cluster[,"tf"], "_", cluster)
     regulon.tf[[cluster]] <- regulon_cluster
   }
-  
+
   combined.regulon <- do.call("rbind", regulon.tf)
-  
+
   combined.graph <- buildGraph(combined.regulon, mode = "tg",
                                weights = "weight")
-  
+
   plotEpiregulonNetwork(combined.graph, layout = layout,
                         tfs_to_highlight = unique(combined.regulon$tf), label_nudge_x = 0.1,
                         label_nudge_y = 0.1)

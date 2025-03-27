@@ -13,7 +13,7 @@ regulonEnrich(TF, regulon, weight = "weight", weight_cutoff = 0.5, genesets)
 
 \item{weight}{String indicating the column name that should be used to filter target genes for geneset enrichment. Default is 'weight'.}
 
-\item{weight_cutoff}{A numeric scalar to indicate the cutoff to filter on the column specified by corr. Default is 0.5.}
+\item{weight_cutoff}{A numeric scalar to indicate the cutoff to filter on the column specified by \code{weight}. Default is 0.5.}
 
 \item{genesets}{A dataframe with the first column being the name of the geneset and the second column being the name of the genes}
 }
@@ -25,15 +25,12 @@ Perform geneset enrichment of user-defined regulons
 }
 \examples{
 #retrieve genesets
-H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-cat = 'H', gene.id.type = 'SYMBOL' )
-C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-cat = 'C6', gene.id.type = 'SYMBOL' )
+msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
 
-#combine genesets and convert genesets to be compatible with enricher
-gs <- c(H,C6)
-gs.list <- do.call(rbind,lapply(names(gs), function(x) {
-data.frame(gs=x, genes=gs[[x]])}))
+#convert genesets to be compatible with enricher
+msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) \%in\% c("c6", "h")}))]
+gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
+ data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))}))
 
 head(gs.list)
 

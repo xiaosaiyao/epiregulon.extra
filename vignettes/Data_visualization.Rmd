@@ -87,7 +87,8 @@ markers <- findDifferentialActivity(
   clusters = GeneExpressionMatrix$hash_assignment,
   pval.type = "some",
   direction = "up",
-  test.type = "t"
+  test.type = "t",
+  logvalue = FALSE
 )
 ```
 
@@ -203,29 +204,12 @@ Sometimes we are interested to know what pathways are enriched in the regulon of
 
 ```{r enrichment, fig.height = 8, fig.width = 14}
 # retrieve genesets
-H <- EnrichmentBrowser::getGenesets(
-  org = "hsa",
-  db = "msigdb",
-  cat = "H",
-  gene.id.type = "SYMBOL"
-)
-C2 <- EnrichmentBrowser::getGenesets(
-  org = "hsa",
-  db = "msigdb",
-  cat = "C2",
-  gene.id.type = "SYMBOL"
-)
-C6 <- EnrichmentBrowser::getGenesets(
-  org = "hsa",
-  db = "msigdb",
-  cat = "C6",
-  gene.id.type = "SYMBOL"
-)
+msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
+msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) %in% c("c6", "h")}))]
 
-# combine genesets and convert genesets to be compatible with enricher
-gs <- c(H, C2, C6)
-gs.list <- do.call(rbind, lapply(names(gs), function(x) {
-  data.frame(gs = x, genes = gs[[x]])
+# convert genesets to be compatible with enricher
+gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
+  data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))
 }))
 
 enrichresults <- regulonEnrich(

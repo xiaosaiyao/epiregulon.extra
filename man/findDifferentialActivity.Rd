@@ -11,6 +11,7 @@ findDifferentialActivity(
   pval.type = "some",
   direction = c("any", "up", "down"),
   groups = deprecated(),
+  logvalues = TRUE,
   ...
 )
 }
@@ -26,6 +27,10 @@ findDifferentialActivity(
 \item{direction}{A string specifying direction of differential TF activity, can be "any", "up" or "down"}
 
 \item{groups}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} A character or integer vector of cluster or group labels for single cells}
+
+\item{logvalues}{logical indicating whether activities are computed from logged gene expression or not.
+If activity is computed from linear values of gene expression, setting logvalues to FALSE will return the log fold changes and the difference.
+If activity is computed from logged values of gene expression, setting logvalues to TRUE will retrun the log changes.}
 
 \item{...}{Further arguments to pass to scran::findMarkers}
 }

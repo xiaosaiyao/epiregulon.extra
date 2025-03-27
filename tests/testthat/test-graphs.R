@@ -229,3 +229,38 @@ test_that("buildDiffGraph function correctly assigns weights in the tripartite m
   expect_identical(re_list_graph, re_list)
   expect_identical(target_list_graph, target_list)
 })
+
+test_that("addCentrality throws the error when input is not an igraph",
+          {expect_error(addCentrality("graph"), "Assertion on 'graph' failed: Must inherit from class 'igraph', but has class 'character'")}
+)
+
+set.seed(4201)
+
+regulon <- data.frame(tf = rep(LETTERS[1:7], times = rmultinom(1,200, prob = c(0.02, 0.05, 0.1, 0.15, 0.2, 0.25, 0.28))[,1]),
+                      target = c(rep(c("F", "G"),3), paste0("gene_", 1:30)[sample(1:30,194, replace=TRUE)]),
+                      weights = runif(200))
+
+tfs <- unique(regulon$tf)
+regulon_aggregated <- data.frame()
+for(tf in tfs){
+  for (tg in unique(regulon[regulon$tf==tf,"target"])){
+    weights <- regulon[regulon$tf==tf & regulon$target==tg, "weights"]
+    regulon_aggregated <- rbind(regulon_aggregated, data.frame(tf=tf, target = tg, weights = weights[which.max(abs(weights))]))
+  }
+}
+centralities <- unlist(lapply(tfs, function(x) sum(regulon_aggregated[regulon_aggregated$tf == x, "weights"])))
+normalized_centralities <- setNames(unlist(lapply(tfs, function(x) sum(regulon_aggregated[regulon_aggregated$tf == x, "weights"])/sqrt(length(regulon_aggregated[regulon_aggregated$tf == x, "weights"])))), tfs)
+test_graph <- buildGraph(regulon_aggregated)
+test_graph <- addCentrality(test_graph)
+res <- data.frame(tf = tfs, centrality = centralities, rank = rank(-centralities))
+res <- res[order(res$centrality, decreasing = TRUE),]
+rownames(res) <- as.integer(res$rank)
+test_that("rankTfs works correctly",
+          {expect_identical(rankTfs(test_graph), res)}
+)
+
+test_graph <- normalizeCentrality(test_graph)
+
+test_that("normalizeCentrality works correctly",
+          {expect_equal(V(test_graph)[V(test_graph)$type == "transcription factor"]$centrality, as.vector(normalized_centralities[V(test_graph)[V(test_graph)$type == "transcription factor"]$name]))}
+)

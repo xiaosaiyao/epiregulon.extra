@@ -26,6 +26,7 @@ plotHeatmapRegulon(
   show_column_names = FALSE,
   column_col = NULL,
   row_col = NULL,
+  genes_label = NULL,
   ...
 )
 }
@@ -73,6 +74,8 @@ See \href{https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annot
 
 \item{row_col}{A list specifying the colors in the rows.
 See \href{https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annotations.html#simple-annotation}{here}}
+
+\item{genes_label}{A character vector indicating a selected list of genes to show on the rownames}
 
 \item{...}{other arguments for \code{ComplexHeatmap::Heatmap}}
 }
