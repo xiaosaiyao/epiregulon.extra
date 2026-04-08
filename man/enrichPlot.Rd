@@ -25,15 +25,12 @@ Plot results of regulonEnrich
 }
 \examples{
 #retrieve genesets
-H <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-cat = 'H', gene.id.type = 'SYMBOL' )
-C6 <- EnrichmentBrowser::getGenesets(org = 'hsa', db = 'msigdb',
-cat = 'C6', gene.id.type = 'SYMBOL' )
+msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
 
-#combine genesets and convert genesets to be compatible with enricher
-gs <- c(H,C6)
-gs.list <- do.call(rbind,lapply(names(gs), function(x) {
-data.frame(gs=x, genes=gs[[x]])}))
+#convert genesets to be compatible with enricher
+msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) \%in\% c("c6", "h")}))]
+gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
+ data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))}))
 
 head(gs.list)
 
