@@ -24,9 +24,9 @@ for n permuted graphs
 Calculate similarity score from permuted graphs to estimate background similarity
 }
 \examples{
-regulon <- data.frame(tf = sample(letters[1:4], 100, replace = TRUE), idxATAC= 1:100,
-target = sample(letters[5:14], 100, replace = TRUE))
+regulon <- data.frame(tf=sample(letters[1:4], 100, replace=TRUE), idxATAC= 1:100,
+target=sample(letters[5:14], 100, replace=TRUE))
 regulon$weights <- runif(100)
 GRN_graph <- buildGraph(regulon)
-permuted_graph <- permuteGraph(GRN_graph, focal_tf = "a")
+permuted_graph <- permuteGraph(GRN_graph, focal_tf="a")
 }

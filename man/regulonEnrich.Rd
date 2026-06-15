@@ -24,22 +24,14 @@ A dataframe showing the significantly enriched pathways
 Perform geneset enrichment of user-defined regulons
 }
 \examples{
-#retrieve genesets
-msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
-
-#convert genesets to be compatible with enricher
-msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) \%in\% c("c6", "h")}))]
-gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
- data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))}))
-
-head(gs.list)
-
-#get regulon
-library(dorothea)
-data(dorothea_hs, package = 'dorothea')
-regulon <- dorothea_hs
-enrichment_results <- regulonEnrich(c('ESR1','AR'), regulon = regulon, weight = 'mor',
-genesets = gs.list)
+# retrieve genesets
+H <- msigdbr::msigdbr(species="Homo sapiens", collection="H")
+genesets <- data.frame(geneset=H$gs_name, genes=H$gene_symbol)
+# create some mock regulons
+regulon <- data.frame(tf=rep("AR",5),
+                      target=c("KLK3","TMPRSS2","KLK2","NKX3-1","FKBP5"),
+                      weight=rep(1,5))
+enrichment_results <- regulonEnrich(c('AR'), regulon=regulon, genesets=genesets)
 
 }
 \author{

@@ -6,7 +6,7 @@
 \usage{
 getSigGenes(
   da_list,
-  fdr_cutoff = 0.05,
+  fdr_cutoff = log(0.05),
   summary_cutoff = NULL,
   topgenes = NULL,
   direction = c("any", "up", "down")
@@ -15,7 +15,7 @@ getSigGenes(
 \arguments{
 \item{da_list}{List of dataframes from running findDifferentialActivity}
 
-\item{fdr_cutoff}{A numeric scalar to specify the cutoff for FDR value. Default is 0.05}
+\item{fdr_cutoff}{A numeric scalar to specify the cutoff for log FDR value. Default is log(0.05)}
 
 \item{summary_cutoff}{A numeric scalar to specify the cutoff for log fold change or difference}
 
@@ -34,10 +34,9 @@ set.seed(1)
 score.combine <- cbind(matrix(runif(2000,0,2), 20,100), matrix(runif(2000,0,10), 20,100))
 rownames(score.combine) <- paste0("TF",1:20)
 colnames(score.combine) <- paste0("cell",1:200)
-cluster <- c(rep(1,100),rep(2,100))
-markers <- findDifferentialActivity(score.combine, cluster, pval.type = "some", direction = "up",
-test.type = "t")
-sig.genes <- getSigGenes(markers, fdr_cutoff = 1, summary_cutoff = 0.1)
+clusters <- c(rep(1,100), rep(2,100))
+markers <- findDifferentialActivity(score.combine, clusters, pval.type="some", direction="up")
+sig.genes <- getSigGenes(markers, fdr_cutoff=1, summary_cutoff=0.1)
 utils::head(sig.genes)
 }
 \author{

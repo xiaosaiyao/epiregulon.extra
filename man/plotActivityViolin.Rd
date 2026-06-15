@@ -26,9 +26,9 @@ plotActivityViolin(
 
 \item{clusters}{A vector of cluster or group labels for single cells}
 
-\item{ncol}{A integer to indicate the number of columns in the combined plot, if \code{combine = TRUE}}
+\item{ncol}{A integer to indicate the number of columns in the combined plot, if \code{combine=TRUE}}
 
-\item{nrow}{A integer to indicate the number of rows in the combined plot, if \code{combine = TRUE}}
+\item{nrow}{A integer to indicate the number of rows in the combined plot, if \code{combine=TRUE}}
 
 \item{combine}{logical to indicate whether to combine and visualize the plots in one panel}
 
@@ -36,7 +36,7 @@ plotActivityViolin(
 
 \item{colors}{A character vector representing the names of colors}
 
-\item{title}{String indicating the title of the plot if \code{combine = TRUE}}
+\item{title}{String indicating the title of the plot if \code{combine=TRUE}}
 
 \item{text_size}{Scalar indicating the font size of the title}
 
@@ -45,18 +45,18 @@ plotActivityViolin(
 \item{boxplot}{logical indicating whether to add boxplot on top of violin plot}
 }
 \value{
-A combined ggplot object or a list of ggplots if \code{combine = FALSE}
+A combined ggplot object or a list of ggplots if \code{combine=FALSE}
 }
 \description{
 Generate violin plots of inferred activities for a list of TFs grouped by cluster/group labels
 }
 \examples{
 # create a mock singleCellExperiment object for gene expression matrix
-example_sce <- scuttle::mockSCE()
-example_sce <- scuttle::logNormCounts(example_sce)
-example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
-plotActivityViolin(activity_matrix = logcounts(example_sce),
-tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
+sce <- scuttle::mockSCE()
+sce <- scrapper::normalizeRnaCounts.se(sce)
+plotActivityViolin(activity_matrix=logcounts(sce),
+    tf=c('Gene_0001','Gene_0002'),  clusters=sce$Treatment,
+    boxplot=TRUE)
 
 }
 \author{

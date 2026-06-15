@@ -23,37 +23,36 @@ For full documentation of the `epiregulon` package, please refer to the [epiregu
 # Installation
 
 ```{r, results='hide', message=FALSE, eval=FALSE}
- if (!require("BiocManager", quietly = TRUE))
-     install.packages("BiocManager")
+if (!require("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 
- BiocManager::install("epiregulon.extra")
-
+BiocManager::install("epiregulon.extra")
 ```
 
 # Data preparation
 
 To continue with the visualization functions, we will first need the gene expression matrix. We can download the data from `r BiocStyle::Biocpkg("scMultiome")`. <br>
 
-```{r}
-# load the MAE object
+```{r, results='hide', message=FALSE}
 library(scMultiome)
-
 mae <- scMultiome::reprogramSeq()
 
-# expression matrix
+
 GeneExpressionMatrix <- mae[["GeneExpressionMatrix"]]
 rownames(GeneExpressionMatrix) <- rowData(GeneExpressionMatrix)$name
 
 reducedDim(GeneExpressionMatrix, "UMAP_Combined") <- 
-  reducedDim(mae[["TileMatrix500"]], "UMAP_Combined")
+    reducedDim(mae[["TileMatrix500"]], "UMAP_Combined")
 
-# arrange hash_assignment
-GeneExpressionMatrix$hash_assignment <- factor(as.character(
-  GeneExpressionMatrix$hash_assignment),
-  levels = c("HTO10_GATA6_UTR", "HTO2_GATA6_v2", "HTO8_NKX2.1_UTR", "HTO3_NKX2.1_v2",
-    "HTO1_FOXA2_v2", "HTO4_mFOXA1_v2", "HTO6_hFOXA1_UTR", "HTO5_NeonG_v2"
-  )
-)
+GeneExpressionMatrix$hash_assignment <- factor(as.character(GeneExpressionMatrix$hash_assignment),
+                                               levels=c("HTO10_GATA6_UTR", 
+                                                        "HTO2_GATA6_v2", 
+                                                        "HTO8_NKX2.1_UTR", 
+                                                        "HTO3_NKX2.1_v2",
+                                                        "HTO1_FOXA2_v2", 
+                                                        "HTO4_mFOXA1_v2", 
+                                                        "HTO6_hFOXA1_UTR", 
+                                                        "HTO5_NeonG_v2"))
 ```
 
 # Calculate TF activity 
@@ -61,58 +60,55 @@ GeneExpressionMatrix$hash_assignment <- factor(as.character(
 Next we load the regulon object previously calculated by epiregulon. Here we just use the pruned version of regulon object in which only relevant columns are kept. 
 Using epiregulon, we can calculate activity of transcription factors included in the regulon object.
 
-```{r calculateActivity, results = "hide"}
+```{r calculateActivity, results="hide"}
 library(epiregulon)
 library(epiregulon.extra)
 
 data(regulon)
 
 score.combine <- calculateActivity(
-  expMatrix = GeneExpressionMatrix,
-  regulon = regulon,
-  mode = "weight",
-  method = "weightedMean",
-  exp_assay = "normalizedCounts",
-  normalize = FALSE
+    expMatrix=GeneExpressionMatrix,
+    regulon=regulon,
+    mode="weight",
+    exp_assay="normalizedCounts",
+    normalize=FALSE
 )
 ```
 
 # Perform differential activity
 
-We perform a differential analysis of transcription factor activity across groups of cells. This function is a wrapper around `findMarkers` from `r BiocStyle::Biocpkg("scran")`.
+We perform a differential analysis of transcription factor activity across groups of cells. This function is adapted from `findMarkers` of `r BiocStyle::Biocpkg("scran")`. It performs pairwise t-tests across clusters and combines the p-values according to `pval.type`.
 ```{r differential}
 library(epiregulon.extra)
 markers <- findDifferentialActivity(
-  activity_matrix = score.combine,
-  clusters = GeneExpressionMatrix$hash_assignment,
-  pval.type = "some",
-  direction = "up",
-  test.type = "t",
-  logvalue = FALSE
+    activity_matrix=score.combine,
+    clusters=GeneExpressionMatrix$hash_assignment,
+    pval.type="some",
+    direction="up"
 )
 ```
 
 We can specify the top transcription factors of interest
 ```{r}
-markers.sig <- getSigGenes(markers, topgenes = 5)
+markers.sig <- getSigGenes(markers, topgenes=5)
 ```
 # Visualize the results
 
 We visualize the known differential transcription factors by bubble plot
 ```{r visualization}
 plotBubble(
-  activity_matrix = score.combine,
-  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2"),
-  clusters = GeneExpressionMatrix$hash_assignment
+    activity_matrix=score.combine,
+    tf=c("NKX2-1", "GATA6", "FOXA1", "FOXA2"),
+    clusters=GeneExpressionMatrix$hash_assignment
 )
 ```
 
 Then visualize the most differential transcription factors by clusters
 ```{r}
 plotBubble(
-  activity_matrix = score.combine,
-  tf = markers.sig$tf,
-  clusters = GeneExpressionMatrix$hash_assignment
+    activity_matrix=score.combine,
+    tf=markers.sig$tf,
+    clusters=GeneExpressionMatrix$hash_assignment
 )
 ```
 
@@ -120,26 +116,27 @@ Visualize the known differential transcription factors by violin plot.
 
 ```{r}
 plotActivityViolin(
-  activity_matrix = score.combine,
-  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
-  clusters = GeneExpressionMatrix$hash_assignment
+    activity_matrix=score.combine,
+    tf=c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+    clusters=GeneExpressionMatrix$hash_assignment,
+    boxplot = TRUE
 )
 ```
 
 Visualize the known differential transcription factors by UMAP
-```{r, fig.height = 6, fig.width = 9}
+```{r, fig.height=6, fig.width=9}
 
 options(ggrastr.default.dpi=100)
 
 ActivityPlot <- plotActivityDim(
-  sce = GeneExpressionMatrix,
-  activity_matrix = score.combine,
-  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
-  dimtype = "UMAP_Combined",
-  label = "Clusters",
-  point_size = 0.3,
-  ncol = 3,
-  rasterise = TRUE
+      sce=GeneExpressionMatrix,
+      activity_matrix=score.combine,
+      tf=c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+      dimtype="UMAP_Combined",
+      label="Clusters",
+      point_size=0.3,
+      ncol=3,
+      rasterise=TRUE
 )
 
 
@@ -147,22 +144,22 @@ ActivityPlot
 ```
 
 In contrast, the gene expression of the transcription factors is very sparse
-```{r, fig.height = 6, fig.width = 9}
+```{r, fig.height=6, fig.width=9}
 
 options(ggrastr.default.dpi=100)
 
 ActivityPlot <- plotActivityDim(
-  sce = GeneExpressionMatrix,
-  activity_matrix = counts(GeneExpressionMatrix),
-  tf = c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
-  dimtype = "UMAP_Combined",
-  label = "Clusters",
-  point_size = 0.3,
-  ncol = 3,
-  limit = c(0, 2),
-  colors = c("grey", "blue"),
-  legend.label = "GEX",
-  rasterise = TRUE
+    sce=GeneExpressionMatrix,
+    activity_matrix=counts(GeneExpressionMatrix),
+    tf=c("NKX2-1", "GATA6", "FOXA1", "FOXA2", "AR"),
+    dimtype="UMAP_Combined",
+    label="Clusters",
+    point_size=0.3,
+    ncol=3,
+    limit=c(0, 2),
+    colors=c("grey", "blue"),
+    legend.label="GEX",
+    rasterise=TRUE
 )
 ActivityPlot
 ```
@@ -171,30 +168,30 @@ Visualize the activity of the selected transcription factors by heat map. Due to
 
 ```{r eval=FALSE}
 plotHeatmapRegulon(
-  sce = GeneExpressionMatrix,
-  tfs = c("GATA6", "NKX2-1"),
-  regulon = regulon,
-  regulon_cutoff = 0,
-  downsample = 1000,
-  cell_attributes = "hash_assignment",
-  col_gap = "hash_assignment",
-  exprs_values = "normalizedCounts",
-  name = "regulon heatmap",
-  column_title_rot = 45,
-  raster_quality=4
+    sce=GeneExpressionMatrix,
+    tfs=c("GATA6", "NKX2-1"),
+    regulon=regulon,
+    regulon_cutoff=0,
+    downsample=1000,
+    cell_attributes="hash_assignment",
+    col_gap="hash_assignment",
+    exprs_values="normalizedCounts",
+    name="regulon heatmap",
+    column_title_rot=45,
+    raster_quality=4
 )
 
 
 plotHeatmapActivity(
-  activity = score.combine,
-  sce = GeneExpressionMatrix,
-  tfs = c("GATA6", "NKX2-1", "FOXA1", "FOXA2"),
-  downsample = 5000,
-  cell_attributes = "hash_assignment",
-  col_gap = "hash_assignment",
-  name = "Activity",
-  column_title_rot = 45,
-  raster_quality=3
+    activity=score.combine,
+    sce=GeneExpressionMatrix,
+    tfs=c("GATA6", "NKX2-1", "FOXA1", "FOXA2"),
+    downsample=5000,
+    cell_attributes="hash_assignment",
+    col_gap="hash_assignment",
+    name="Activity",
+    column_title_rot=45,
+    raster_quality=3
 )
 ```
 
@@ -202,26 +199,24 @@ plotHeatmapActivity(
 
 Sometimes we are interested to know what pathways are enriched in the regulon of a particular TF. We can perform geneset enrichment using the enricher function from `r BiocStyle::Biocpkg("clusterProfiler")`.
 
-```{r enrichment, fig.height = 8, fig.width = 14}
-# retrieve genesets
-msigdb.hs = msigdb::getMsigdb(org = 'hs', id = 'SYM', version = '7.4')
-msigdb.hs <- msigdb.hs[unlist(lapply(msigdb.hs, function(x) {GSEABase::bcCategory(GSEABase::collectionType(x)) %in% c("c6", "h")}))]
+We retrieve the genesets from msigdb
+```{r}
+H <- msigdbr::msigdbr(species = "Homo sapiens", collection = "H")
+genesets <- data.frame(geneset=H$gs_name,
+                       genes=H$gene_symbol)
+```
 
-# convert genesets to be compatible with enricher
-gs.list <- do.call(rbind, lapply(names(msigdb.hs), function(x) {
-  data.frame(gs = x, genes = GSEABase::geneIds(msigdb.hs[x][[1]]))
-}))
-
+We perform gene set enrichment on the regulons
+```{r enrichment, fig.height=8, fig.width=14}
 enrichresults <- regulonEnrich(
-  TF = c("GATA6", "NKX2-1"),
-  regulon = regulon,
-  weight = "weight",
-  weight_cutoff = 0.1,
-  genesets = gs.list
+    TF=c("GATA6", "NKX2-1"),
+    regulon=regulon,
+    weight="weight",
+    weight_cutoff=0.1,
+    genesets=genesets
 )
 
-# plot results
-enrichPlot(results = enrichresults)
+enrichPlot(results=enrichresults)
 ```
 
 # Network analysis
@@ -229,10 +224,10 @@ enrichPlot(results = enrichresults)
 We can visualize the genesets as a network
 ```{r plot gsea network}
 plotGseaNetwork(
-  tf = names(enrichresults),
-  enrichresults = enrichresults,
-  p.adj_cutoff = 0.1,
-  ntop_pathways = 10
+    tf=names(enrichresults),
+    enrichresults=enrichresults,
+    p.adj_cutoff=0.1,
+    ntop_pathways=10
 )
 ```
 
@@ -242,55 +237,55 @@ We are interested in understanding the differential networks between two conditi
 
 ```{r differential networks}
 plotDiffNetwork(regulon,
-  cutoff = 0.1,
-  tf = c("GATA6"),
-  weight = "weight",
-  clusters = c("C1", "C5"),
-  layout = "stress"
+    cutoff=0.1,
+    tf=c("GATA6"),
+    weight="weight",
+    clusters=c("C1", "C5"),
+    layout="stress"
 )
 
 plotDiffNetwork(regulon,
-  cutoff = 0.1,
-  tf = c("NKX2-1"),
-  weight = "weight",
-  clusters = c("C3", "C5"),
-  layout = "stress"
+    cutoff=0.1,
+    tf=c("NKX2-1"),
+    weight="weight",
+    clusters=c("C3", "C5"),
+    layout="stress"
 )
 ```
 
 We can also visualize how transcription factors relate to other transcription factors in C1 cluster.
 ```{r}
 selected <- which(regulon$weight[, "C1"] > 0 &
-  regulon$tf %in% c("GATA6", "FOXA1", "AR"))
+    regulon$tf %in% c("GATA6", "FOXA1", "AR"))
 
 C1_network <- buildGraph(regulon[selected, ],
-  weights = "weight",
-  cluster = "C1"
-  )
+    weights="weight",
+    cluster="C1"
+)
 
 plotEpiregulonNetwork(C1_network,
-  layout = "sugiyama",
-  tfs_to_highlight = c("GATA6", "FOXA1", "AR")) + 
-  ggplot2::ggtitle("C1")
+    layout="sugiyama",
+    tfs_to_highlight=c("GATA6", "FOXA1", "AR")) + 
+    ggplot2::ggtitle("C1")
 ```
 To systematically examine the differential network topology between two clusters, we perform an edge subtraction between two graphs, using weights computed by `pruneRegulon`. We then calculate the degree centrality of the weighted differential graphs and if desired, normalize the differential centrality against the total number of edges. The default normalization function is `sqrt` as it preserves both the difference in the number of edges (but scaled by sqrt) and the differences in the weights. If the user only wants to examine the differences in the averaged weights, the `FUN` argument can be changed to `identity`. Finally, we rank the transcription factors by (normalized) differential centrality. For demonstration purpose, the regulon list is truncated but the full list would contain all the transcription factors.
 
 
 ```{r}
 # rank by differential centrality
-C1_network <- buildGraph(regulon, weights = "weight", cluster = "C1")
-C5_network <- buildGraph(regulon, weights = "weight", cluster = "C5")
+C1_network <- buildGraph(regulon, weights="weight", cluster="C1")
+C5_network <- buildGraph(regulon, weights="weight", cluster="C5")
 
-diff_graph <- buildDiffGraph(C1_network, C5_network, abs_diff = FALSE)
+diff_graph <- buildDiffGraph(C1_network, C5_network, abs_diff=FALSE)
 diff_graph <- addCentrality(diff_graph)
 diff_graph <- normalizeCentrality(diff_graph)
 rank_table <- rankTfs(diff_graph)
 
 library(ggplot2)
-ggplot(rank_table, aes(x = rank, y = centrality)) +
-  geom_point() +
-  ggrepel::geom_text_repel(data = rank_table, aes(label = tf)) +
-  theme_classic()
+ggplot(rank_table, aes(x=rank, y=centrality)) +
+    geom_point() +
+    ggrepel::geom_text_repel(data=rank_table, aes(label=tf)) +
+    theme_classic()
 ```
 
 # Session Info

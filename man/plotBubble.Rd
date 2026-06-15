@@ -8,7 +8,7 @@ plotBubble(
   activity_matrix,
   tf,
   clusters,
-  bubblesize = c("log.FDR", "summary.logFC", "summary.diff"),
+  bubblesize = c("log.FDR", "logFC", "diff"),
   color.theme = "viridis",
   legend.label = "relative_activity",
   x.label = "clusters",
@@ -25,7 +25,7 @@ plotBubble(
 \item{clusters}{A character or integer vector of cluster or group labels for single cells}
 
 \item{bubblesize}{String indicating the variable from findDifferentialActivity output to scale size of bubbles
-by either \code{log.FDR}, \code{summary.logFC} or \code{summary.diff}. Default is \code{logFDR}.}
+by either \code{log.FDR}, \code{logFC} or \code{diff}. Default is \code{log.FDR}.}
 
 \item{color.theme}{String indicating the color theme used for the bubble plot and corresponding to the color options
 in \code{scale_color_viridis_c}}
@@ -47,11 +47,10 @@ A ggplot object
 Generate bubble plots of relative activities across cluster/group labels for a list of TFs
 }
 \examples{
-example_sce <- scuttle::mockSCE()
-example_sce <- scuttle::logNormCounts(example_sce)
-example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
-plotBubble(activity_matrix = logcounts(example_sce),
-tf = c('Gene_0001','Gene_0002'),  clusters = example_sce$cluster)
+sce <- scuttle::mockSCE()
+sce <- scrapper::normalizeRnaCounts.se(sce)
+plotBubble(activity_matrix=logcounts(sce),
+    tf=c('Gene_0001','Gene_0002'),  clusters=sce$Treatment)
 }
 \author{
 Shang-yang Chen

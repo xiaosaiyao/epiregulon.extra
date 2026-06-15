@@ -7,19 +7,15 @@
 findDifferentialActivity(
   activity_matrix,
   clusters,
-  test.type = c("t", "wilcox", "binom"),
   pval.type = c("some", "any", "all"),
   direction = c("any", "up", "down"),
-  logvalues = TRUE,
-  ...
+  logvalues = TRUE
 )
 }
 \arguments{
 \item{activity_matrix}{A matrix of TF activities inferred from calculateActivity}
 
 \item{clusters}{A character or integer vector of cluster or group labels for single cells}
-
-\item{test.type}{String indicating the type of statistical tests to be passed to scran::findMarkers, can be "t", "wilcox". or "binom"}
 
 \item{pval.type}{A string specifying how p-values are to be combined across pairwise comparisons for a given group/cluster. For more details see \link[scran]{combineMarkers}.}
 
@@ -28,8 +24,6 @@ findDifferentialActivity(
 \item{logvalues}{logical indicating whether activities are computed from logged gene expression or not.
 If activity is computed from linear values of gene expression, setting logvalues to FALSE will return the difference.
 If activity is computed from logged values of gene expression, setting logvalues to TRUE will return the log changes.}
-
-\item{...}{Further arguments to pass to scran::findMarkers}
 }
 \value{
 A named list of dataframes containing differential TF activity test results for each cluster/group
@@ -44,12 +38,11 @@ rownames(score.combine) <- paste0("TF",1:20)
 colnames(score.combine) <- paste0("cell",1:200)
 cluster <- c(rep(1,100),rep(2,100))
 markers <- findDifferentialActivity(
-activity_matrix = score.combine,
-clusters = cluster,
-pval.type = "some",
-direction = "up",
-test.type = "t")
-sig.genes <- getSigGenes(markers, fdr_cutoff = 1, summary_cutoff = 0.1)
+    activity_matrix=score.combine,
+    clusters=cluster,
+    pval.type="some",
+    direction="up")
+sig.genes <- getSigGenes(markers, fdr_cutoff=1, summary_cutoff=0.1)
 }
 \author{
 Xiaosai Yao, Shang-yang Chen

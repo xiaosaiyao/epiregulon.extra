@@ -66,13 +66,12 @@ A Heatmap-class object.
 Plot transcription factor activity
 }
 \examples{
-example_sce <- scuttle::mockSCE()
-example_sce <- scuttle::logNormCounts(example_sce)
-example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
+sce <- scuttle::mockSCE()
+sce <- scrapper::normalizeRnaCounts.se(sce)
 activity_matrix <- matrix(rnorm(10*200), nrow=10, ncol=200)
-rownames(activity_matrix) <- sample(rownames(example_sce),10)
-plotHeatmapActivity(activity_matrix=activity_matrix, sce=example_sce,
-tfs=rownames(activity_matrix), cell_attributes='cluster', col_gap='cluster')
+rownames(activity_matrix) <- sample(rownames(sce),10)
+plotHeatmapActivity(activity_matrix=activity_matrix, sce=sce,
+    tfs=rownames(activity_matrix), cell_attributes='Treatment', col_gap='Treatment')
 }
 \author{
 Xiaosai Yao

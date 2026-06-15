@@ -94,35 +94,35 @@
 #' @examples
 #' # create an artificial getRegulon output
 #' set.seed(1234)
-#' tf_set <- apply(expand.grid(LETTERS[1:10], LETTERS[1:10]),1,  paste, collapse = '')
-#' regulon <- DataFrame(tf = sample(tf_set, 5e3, replace = TRUE))
+#' tf_set <- apply(expand.grid(LETTERS[1:10], LETTERS[1:10]),1,  paste, collapse='')
+#' regulon <- DataFrame(tf=sample(tf_set, 5e3, replace=TRUE))
 #' gene_set <- expand.grid(LETTERS[1:10], LETTERS[1:10], LETTERS[1:10])
 #' gene_set <- apply(gene_set,1,function(x) paste0(x,collapse=''))
-#' regulon$target <- sample(gene_set, 5e3, replace = TRUE)
+#' regulon$target <- sample(gene_set, 5e3, replace=TRUE)
 #' regulon$idxATAC <- 1:5e3
 #' regulon$corr <- runif(5e3)*0.5+0.5
 #' regulon$weights <- matrix(runif(15000), nrow=5000, ncol=3)
 #' colnames(regulon$weights) <- c('all','cluster1', 'cluster2')
-#' graph_tripartite <- buildGraph(regulon, cluster='all', mode = 'tripartite')
+#' graph_tripartite <- buildGraph(regulon, cluster='all', mode='tripartite')
 #'
 #' # build bipartite graph using regulatory element-target gene pairs
-#' graph_pairs_1 <- buildGraph(regulon, cluster = 'cluster1', mode = 'pairs')
-#' graph_pairs_2 <- buildGraph(regulon, cluster = 'cluster2', mode = 'pairs')
+#' graph_pairs_1 <- buildGraph(regulon, cluster='cluster1', mode='pairs')
+#' graph_pairs_2 <- buildGraph(regulon, cluster='cluster2', mode='pairs')
 #' graph_diff <- buildDiffGraph(graph_pairs_1, graph_pairs_2)
 #' graph_diff <- addCentrality(graph_diff)
 #' graph_diff <- normalizeCentrality(graph_diff)
 #' tf_ranking <- rankTfs(graph_diff)
 #'
-#' @importFrom igraph V E graph_from_data_frame vcount delete_edges delete_vertices degree graph_from_adjacency_matrix as_adjacency_matrix V<- incident_edges strength edge_attr_names list.vertex.attributes
+#' @import igraph
 #' @export
 buildGraph <- function(regulon,
-                       mode = c("tg", "tripartite", "re", "pairs"),
-                       weights = "weights",
-                       cluster = "all",
-                       aggregation_function = function(x) x[which.max(abs(x))],
-                       na_replace = TRUE,
-                       keep_original_names = TRUE,
-                       filter_edges = NULL) {
+                       mode=c("tg", "tripartite", "re", "pairs"),
+                       weights="weights",
+                       cluster="all",
+                       aggregation_function=function(x) x[which.max(abs(x))],
+                       na_replace=TRUE,
+                       keep_original_names=TRUE,
+                       filter_edges=NULL) {
 
   if (!is.null(weights) && !weights %in%
       colnames(regulon))
@@ -135,10 +135,10 @@ buildGraph <- function(regulon,
   regulon$target <- paste0(regulon$target,
                            "_target_gene")
   vertex_columns <- switch(mode,
-                           re = c("tf", "idxATAC"),
-                           pairs = c("tf", "idxATAC","target"),
-                           tripartite = c("idxATAC","target"),
-                           tg = c("tf","target"))
+                           re=c("tf", "idxATAC"),
+                           pairs=c("tf", "idxATAC","target"),
+                           tripartite=c("idxATAC","target"),
+                           tg=c("tf","target"))
 
   graph_data <- regulon[, vertex_columns]
 
@@ -160,8 +160,8 @@ buildGraph <- function(regulon,
   if (mode == "tripartite") {
     # add tf-re data
     colnames(graph_data) <- c("from", "to", weights)
-    graph_data_tf_re <- data.frame(from = regulon$tf,
-                                   to = regulon$idxATAC)
+    graph_data_tf_re <- data.frame(from=regulon$tf,
+                                   to=regulon$idxATAC)
     if (!is.null(weights)) {
       graph_data_tf_re[, weights] <- weights_df[[1]]
     }
@@ -174,7 +174,7 @@ buildGraph <- function(regulon,
   if (mode == "pairs") {
     # create node names corresponding to re-tg pairs
     graph_data$target <- paste(graph_data$idxATAC,
-                               graph_data$target, sep = "@")
+                               graph_data$target, sep="@")
     graph_data <- graph_data[,c("tf", "target", weights)]
     vertex_columns <- c("tf","target")
   }
@@ -231,21 +231,28 @@ buildGraph <- function(regulon,
 
 #' @rdname buildGraph
 #' @export
-buildDiffGraph <- function(graph_obj_1, graph_obj_2, weighted = TRUE, abs_diff = TRUE) {
-  checkmate::assertClass(graph_obj_1, "igraph")
-  checkmate::assertClass(graph_obj_2, "igraph")
+#' @importFrom methods is
+buildDiffGraph <- function(graph_obj_1, graph_obj_2, weighted=TRUE, abs_diff=TRUE) {
+  if (!is(graph_obj_1, "igraph")) {
+    stop("graph_obj_1 must be an igraph object")
+  }
+  
+  if (!is(graph_obj_2, "igraph")) {
+    stop("graph_obj_2 must be an igraph object")
+  }
+
   if (!identical(V(graph_obj_1)$name, V(graph_obj_2)$name)) {
     stop("The nodes should be the same in both graphs")
   }
   transformation_function <- ifelse(abs_diff, abs, identity)
   if (weighted) {
-    res <- graph_from_adjacency_matrix(transformation_function(as_adjacency_matrix(graph_obj_1, attr = "weight") -
-                                                                 as_adjacency_matrix(graph_obj_2, attr = "weight")), weighted = TRUE)
+    res <- graph_from_adjacency_matrix(transformation_function(as_adjacency_matrix(graph_obj_1, attr="weight") -
+                                                                 as_adjacency_matrix(graph_obj_2, attr="weight")), weighted=TRUE)
     # remove zero-weight edges
     res <- delete_edges(res, E(res)[E(res)$weight == 0])
   } else {
     res <- graph_from_adjacency_matrix(abs(as_adjacency_matrix(graph_obj_1) - as_adjacency_matrix(graph_obj_2)),
-                                       weighted = FALSE)
+                                       weighted=FALSE)
   }
 
   if (!identical(V(graph_obj_1)$type, V(graph_obj_2)$type)) {
@@ -255,31 +262,37 @@ buildDiffGraph <- function(graph_obj_1, graph_obj_2, weighted = TRUE, abs_diff =
   V(res)$type.num <- V(graph_obj_1)$type.num
 
   # remove nodes with no edges
-  edge_numbers <- vapply(incident_edges(res, V(res), mode = "all"), length, FUN.VALUE = numeric(1))
+  edge_numbers <- vapply(incident_edges(res, V(res), mode="all"), length, FUN.VALUE=numeric(1))
   res <- delete_vertices(res, V(res)[edge_numbers == 0])
   res
 }
 
 #' @rdname buildGraph
 #' @export
+#' @importFrom methods is
 addCentrality <- function(graph) {
-  checkmate::assertClass(graph, "igraph")
+  if (!is(graph, "igraph")) {
+    stop("graph must be an igraph object")
+  }
   V(graph)$centrality <- strength(graph)
   graph
 }
 
 #' @rdname buildGraph
 #' @export
-normalizeCentrality <- function(graph, FUN = sqrt, weighted = TRUE) {
-  checkmate::assertClass(graph, "igraph")
+#' @importFrom methods is
+normalizeCentrality <- function(graph, FUN=sqrt, weighted=TRUE) {
+  if (!is(graph, "igraph")) {
+    stop("graph must be an igraph object")
+  }
   if (!"centrality" %in% list.vertex.attributes(graph))
     stop("Vertices do not have 'centrality' attribute")
   if (!"weight" %in% edge_attr_names(graph) & weighted)
-    stop("Set 'weight' attribute to edges or use with 'weighted = FALSE'")
+    stop("Set 'weight' attribute to edges or use with 'weighted=FALSE'")
 
   # calculate number of edges for each node
-  edge_numbers <- vapply(incident_edges(graph, V(graph), mode = "all"),
-                         length, FUN.VALUE = numeric(1))
+  edge_numbers <- vapply(incident_edges(graph, V(graph), mode="all"),
+                         length, FUN.VALUE=numeric(1))
 
   V(graph)$centrality <- V(graph)$centrality/FUN(edge_numbers)
   graph
@@ -287,13 +300,16 @@ normalizeCentrality <- function(graph, FUN = sqrt, weighted = TRUE) {
 
 #' @rdname buildGraph
 #' @export
-rankTfs <- function(graph, type_attr = "type") {
-  checkmate::assertClass(graph, "igraph")
-  rank_df <- data.frame(tf = V(graph)$name[order(V(graph)$centrality[vertex_attr(graph,type_attr) == "transcription factor"],
-                                                 decreasing = TRUE)],
-                        centrality = sort(V(graph)$centrality[vertex_attr(graph, type_attr) == "transcription factor"],
-                                          decreasing = TRUE))
-  rank_df$rank <- base::rank(-rank_df$centrality)
+#' @importFrom methods is
+rankTfs <- function(graph, type_attr="type") {
+  if (!is(graph, "igraph")) {
+    stop("graph must be an igraph object")
+  }
+  rank_df <- data.frame(tf=V(graph)$name[order(V(graph)$centrality[vertex_attr(graph,type_attr) == "transcription factor"],
+                                                 decreasing=TRUE)],
+                        centrality=sort(V(graph)$centrality[vertex_attr(graph, type_attr) == "transcription factor"],
+                                          decreasing=TRUE))
+  rank_df$rank <- rank(-rank_df$centrality)
   rank_df
 }
 
@@ -326,50 +342,52 @@ rankTfs <- function(graph, type_attr = "type") {
 #' @param ... optional additional arguments to pass to \link[ggraph]{create_layout}
 #' @return a ggraph object
 #' @importFrom ggraph create_layout ggraph geom_edge_link geom_node_label
-#' @importFrom ggplot2 aes theme_void labs
+#' @importFrom methods is
+#' @import ggplot2
 #' @author Timothy Keyes, Tomasz Wlodarczyk
 #' @examples
 #' # create an artificial getRegulon output
 #' set.seed(1234)
-#' tf_set <- apply(expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)]),1,  paste, collapse = '')
-#' regulon <- data.frame(tf = sample(tf_set, 5e2, replace = TRUE))
+#' tf_set <- apply(expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)]),1,  paste, collapse='')
+#' regulon <- data.frame(tf=sample(tf_set, 5e2, replace=TRUE))
 #' gene_set <- expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)], LETTERS[seq_len(5)])
 #' gene_set <- apply(gene_set,1,function(x) paste0(x,collapse=''))
-#' regulon$target <- sample(gene_set, 5e2, replace = TRUE)
+#' regulon$target <- sample(gene_set, 5e2, replace=TRUE)
 #' regulon$idxATAC <- seq_len(5e2)
 #' regulon$corr <- runif(5e2)*0.5+0.5
 #' regulon$weights <- runif(500)
 #' #create igraph object
-#' graph_tripartite <- buildGraph(regulon, mode = 'tripartite')
-#' plotEpiregulonNetwork(graph_tripartite, tfs_to_highlight = sample(unique(tf_set),3),
-#' edge_alpha = 0.2)
+#' graph_tripartite <- buildGraph(regulon, mode='tripartite')
+#' plotEpiregulonNetwork(graph_tripartite, tfs_to_highlight=sample(unique(tf_set),3),
+#' edge_alpha=0.2)
 #' @export
 plotEpiregulonNetwork <- function(graph,
-                                  layout = "stress", label_size = 3,
-                                  tfs_to_highlight = NULL, edge_alpha = 0.02,
-                                  point_size = 1, point_border_size = 0.5,
-                                  label_alpha = 0.8, label_nudge_x = 0.2,
-                                  label_nudge_y = 0.2, ...) {
-  checkmate::assertClass(graph,
-                         "igraph")
+                                  layout="stress", label_size=3,
+                                  tfs_to_highlight=NULL, edge_alpha=0.02,
+                                  point_size=1, point_border_size=0.5,
+                                  label_alpha=0.8, label_nudge_x=0.2,
+                                  label_nudge_y=0.2, ...) {
+  if (!is(graph, "igraph")) {
+    stop("graph must be an igraph object")
+  }
   my_layout <- create_layout(graph,
-                             layout = layout, ...)
+                             layout=layout, ...)
   highlighted <- my_layout[my_layout$name %in%
                              tfs_to_highlight, ]
-  my_plot <- ggraph(graph = my_layout) +
-    geom_edge_link(alpha = edge_alpha) +
-    geom_node_point(aes(fill = type),
-                    shape = 21, size = point_size,
-                    stroke = point_border_size) +
-    geom_node_label(aes(label = name),
-                    data = highlighted, alpha = label_alpha,
-                    nudge_x = label_nudge_x,
-                    nudge_y = label_nudge_y,
-                    size = label_size) +
-    geom_node_point(aes(fill = type),
-                    shape = 21, data = highlighted,
-                    size = 3, stroke = point_border_size) +
-    theme_void() + labs(fill = NULL)
+  my_plot <- ggraph(graph=my_layout) +
+    geom_edge_link(alpha=edge_alpha) +
+    geom_node_point(aes(fill=type),
+                    shape=21, size=point_size,
+                    stroke=point_border_size) +
+    geom_node_label(aes(label=name),
+                    data=highlighted, alpha=label_alpha,
+                    nudge_x=label_nudge_x,
+                    nudge_y=label_nudge_y,
+                    size=label_size) +
+    geom_node_point(aes(fill=type),
+                    shape=21, data=highlighted,
+                    size=3, stroke=point_border_size) +
+    theme_void() + labs(fill=NULL)
 
   return(my_plot)
 }
@@ -394,20 +412,20 @@ plotEpiregulonNetwork <- function(graph,
 #' @examples
 #' #' # create an artificial getRegulon output
 #' set.seed(1234)
-#' tf_set <- apply(expand.grid(LETTERS[1:10], LETTERS[1:10]),1,  paste, collapse = '')
-#' regulon <- S4Vectors::DataFrame(tf = sample(tf_set, 5e3, replace = TRUE))
+#' tf_set <- apply(expand.grid(LETTERS[1:10], LETTERS[1:10]),1,  paste, collapse='')
+#' regulon <- S4Vectors::DataFrame(tf=sample(tf_set, 5e3, replace=TRUE))
 #' gene_set <- expand.grid(LETTERS[1:10], LETTERS[1:10], LETTERS[1:10])
 #' gene_set <- apply(gene_set,1,function(x) paste0(x,collapse=''))
-#' regulon$target <- sample(gene_set, 5e3, replace = TRUE)
+#' regulon$target <- sample(gene_set, 5e3, replace=TRUE)
 #' regulon$idxATAC <- 1:5e3
-#' regulon$weight <- cbind(data.frame(C1 = runif(5e3), C2 = runif(5e3),
-#' C3 = runif(5e3)))
-#' plotDiffNetwork(regulon, tf = unique(tf_set)[1:3],
-#' clusters = c('C1', 'C2', 'C3'), cutoff = 0.2)
+#' regulon$weight <- cbind(data.frame(C1=runif(5e3), C2=runif(5e3),
+#' C3=runif(5e3)))
+#' plotDiffNetwork(regulon, tf=unique(tf_set)[1:3],
+#' clusters=c('C1', 'C2', 'C3'), cutoff=0.2)
 #' @export
 
-plotDiffNetwork <- function(regulon, cutoff = 0.01, tf = NULL,
-                            weight = "weight", clusters, layout = "stress") {
+plotDiffNetwork <- function(regulon, cutoff=0.01, tf=NULL,
+                            weight="weight", clusters, layout="stress") {
   regulon.tf <- list()
   for (cluster in clusters) {
     # apply cutoff
@@ -424,19 +442,20 @@ plotDiffNetwork <- function(regulon, cutoff = 0.01, tf = NULL,
 
   combined.regulon <- do.call("rbind", regulon.tf)
 
-  combined.graph <- buildGraph(combined.regulon, mode = "tg",
-                               weights = "weight")
+  combined.graph <- buildGraph(combined.regulon, mode="tg",
+                               weights="weight")
 
-  plotEpiregulonNetwork(combined.graph, layout = layout,
-                        tfs_to_highlight = unique(combined.regulon$tf), label_nudge_x = 0.1,
-                        label_nudge_y = 0.1)
+  plotEpiregulonNetwork(combined.graph, layout=layout,
+                        tfs_to_highlight=unique(combined.regulon$tf), label_nudge_x=0.1,
+                        label_nudge_y=0.1)
 }
 
+#' @importFrom stats aggregate
 aggregate_edges <- function(graph_data, FUN) {
   grouping_factors <- paste(setdiff(colnames(graph_data), "weight"),
-                            collapse = "+")
-  aggregation_formula <- eval(parse(text = paste0("weight", "~",
+                            collapse="+")
+  aggregation_formula <- eval(parse(text=paste0("weight", "~",
                                                   grouping_factors)))
-  stats::aggregate(graph_data, aggregation_formula, FUN)
+  aggregate(graph_data, aggregation_formula, FUN)
 }
 

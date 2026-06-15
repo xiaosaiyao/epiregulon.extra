@@ -62,18 +62,18 @@ It makes a force-directed layout plot to visualize it at a high level.
 \examples{
 # create an artificial getRegulon output
 set.seed(1234)
-tf_set <- apply(expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)]),1,  paste, collapse = '')
-regulon <- data.frame(tf = sample(tf_set, 5e2, replace = TRUE))
+tf_set <- apply(expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)]),1,  paste, collapse='')
+regulon <- data.frame(tf=sample(tf_set, 5e2, replace=TRUE))
 gene_set <- expand.grid(LETTERS[seq_len(5)], LETTERS[seq_len(5)], LETTERS[seq_len(5)])
 gene_set <- apply(gene_set,1,function(x) paste0(x,collapse=''))
-regulon$target <- sample(gene_set, 5e2, replace = TRUE)
+regulon$target <- sample(gene_set, 5e2, replace=TRUE)
 regulon$idxATAC <- seq_len(5e2)
 regulon$corr <- runif(5e2)*0.5+0.5
 regulon$weights <- runif(500)
 #create igraph object
-graph_tripartite <- buildGraph(regulon, mode = 'tripartite')
-plotEpiregulonNetwork(graph_tripartite, tfs_to_highlight = sample(unique(tf_set),3),
-edge_alpha = 0.2)
+graph_tripartite <- buildGraph(regulon, mode='tripartite')
+plotEpiregulonNetwork(graph_tripartite, tfs_to_highlight=sample(unique(tf_set),3),
+edge_alpha=0.2)
 }
 \author{
 Timothy Keyes, Tomasz Wlodarczyk

@@ -1,3 +1,5 @@
 ^epiregulon\.extra\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+^\.positai$
+^\.claude$

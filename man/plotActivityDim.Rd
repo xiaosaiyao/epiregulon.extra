@@ -57,13 +57,12 @@ Plot cell-level reduced dimension results stored in a SingleCellExperiment objec
 }
 \examples{
 # create a mock singleCellExperiment object for gene expression matrix
-example_sce <- scuttle::mockSCE()
-example_sce <- scuttle::logNormCounts(example_sce)
-example_sce <- scater::runPCA(example_sce)
-example_sce <- scater::runUMAP(example_sce)
-example_sce$cluster <- sample(LETTERS[1:5], ncol(example_sce), replace = TRUE)
-plotActivityDim(sce = example_sce, activity = logcounts(example_sce),
-tf = c('Gene_0001','Gene_0002'),  label = 'cluster')
+sce <- scuttle::mockSCE()
+sce <- scrapper::normalizeRnaCounts.se(sce)
+sce <- scrapper::runPca.se(sce, features=NULL)
+sce <- scrapper::runUmap.se(sce) 
+plotActivityDim(sce=sce, activity=logcounts(sce),
+    tf=c('Gene_0001','Gene_0002'),  label='Treatment')
 }
 \author{
 Xiaosai Yao, Shang-yang Chen

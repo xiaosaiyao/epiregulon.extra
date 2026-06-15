@@ -1,6 +1,6 @@
 Package: epiregulon.extra
 Title: Companion package to epiregulon with additional plotting, differential and graph functions
-Version: 1.9.0
+Version: 1.9.1
 Authors@R: 
   c(person(given = "Xiaosai", family = "Yao", role = c("aut", "cre"), email = "xiaosai.yao@gmail.com", comment = c(ORCID = "0000-0001-9729-0726")),
     person(given = "Tomasz", family = "Włodarczyk", role = c("aut"), email = "tomwlo@gmail.com", comment = c(ORCID = "0000-0003-1554-9699")),
@@ -10,44 +10,42 @@ Description: Gene regulatory networks model the underlying gene regulation hiera
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Imports:
-    scran,
     ComplexHeatmap,
     Matrix,
     SummarizedExperiment,
-    checkmate,
     circlize,
     clusterProfiler,
     ggplot2,
     ggraph,
     igraph,
     patchwork,
-    reshape2,
     scales,
-    scater
+    scater,
+    S4Vectors,
+    methods,
+    epiregulon
 Depends:
     R (>= 4.4),
     SingleCellExperiment
 Suggests:
-    epiregulon,
     knitr,
     rmarkdown,
     parallel,
     BiocStyle,
     testthat (>= 3.0.0),
-    msigdb,
-    GSEABase,
-    dorothea,
+    msigdbr,
     scMultiome,
-    S4Vectors,
     scuttle,
     vdiffr,
     ggrastr,
-    ggrepel
+    ggrepel,
+    scran,
+    scrapper
 VignetteBuilder: knitr
 URL: https://github.com/xiaosaiyao/epiregulon.extra/
 biocViews: GeneRegulation, Network, GeneExpression, Transcription, ChipOnChip, DifferentialExpression, GeneTarget, Normalization, GraphAndNetwork
 Config/testthat/edition: 3
 BugReports: https://github.com/xiaosaiyao/epiregulon.extra/issues
 LazyData: true
+Config/roxygen2/version: 8.0.0
